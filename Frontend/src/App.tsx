@@ -1,48 +1,15 @@
-import { useEffect, useState } from 'react';
-import { authClient } from './utils/auth-client';
+import { useAuth } from './hooks/useAuth';
 
 function App() {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { user, loading, handleLogin, handleLogout } = useAuth();
 
   function iniciarLoginConGoogle() {
-    authClient.signIn.social({
-      provider: 'google',
-      callbackURL: '/',
-    });
+    handleLogin();
   }
-
-  useEffect(() => {
-    const getUser = async () => {
-      try {
-        const response = await fetch('http://localhost:3000/api/me', {
-          credentials: 'include',
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          
-          if (data.error) return;
-
-          setUser(data);
-        } else {
-          setUser(null);
-        }
-      } catch (error) {
-        console.error('Error al obtener el usuario:', error);
-        setUser(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    getUser();
-  }, []);
 
   async function cerrarSesion() {
     try {
-      await authClient.signOut();
-      setUser(null);
+      await handleLogout();
       console.log('Logout exitoso. Redirigiendo...');
       window.location.href = '/';
     } catch (error) {

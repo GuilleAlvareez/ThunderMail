@@ -16,30 +16,6 @@ app.use(cors(corsOptions));
 app.all('/api/auth/*', toNodeHandler(auth.handler));
 app.use(express.json());
 
-app.get('/api/me', async (req, res) => {
-  try {
-    const requestHeaders = fromNodeHeaders(req.headers)
-    
-    const sessionData = await auth.api.getSession({
-      headers: requestHeaders
-    })
-
-    if (sessionData) {
-      const user = sessionData.user
-      const session = sessionData.session
-      res.json({
-        user,
-        sessionId: session.id
-      })
-    } else {
-      res.send({ error: 'Unauthorized', message: 'No active session found.' })
-    }
-  } catch (error) {
-    console.error('Error al obtener la sesión en /api/me:', error)
-    res.status(500).json({ error: 'Internal Server Error' })
-  }
-})
-
 app.post('/chat/send-email', async (req, res) => {
   const { to, subject, content } = req.body;
 
