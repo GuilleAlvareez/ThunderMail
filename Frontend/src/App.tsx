@@ -1,34 +1,68 @@
-import './App.css'
-import { authClient } from './utils/auth-client'
+import { useEffect, useState } from 'react';
+import { authClient } from './utils/auth-client';
+
 function App() {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   function iniciarLoginConGoogle() {
-    // Esta función llamará a tu backend, que luego redirigirá a Google.
     authClient.signIn.social({
-      provider: "google",
-      // Opcional: a dónde redirigir al usuario después de un login exitoso.
-      callbackURL: "/" 
+      provider: 'google',
+      callbackURL: '/',
     });
   }
 
-  function cerrarSesion() {
-    authClient.signOut();
-    console.log("Logout exitoso. Redirigiendo...");
-    window.location.href = '/';
+  useEffect(() => {
+    const getUser = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/api/me', {
+          credentials: 'include',
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          
+          if (data.error) return;
+
+          setUser(data);
+        } else {
+          setUser(null);
+        }
+      } catch (error) {
+        console.error('Error al obtener el usuario:', error);
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getUser();
+  }, []);
+
+  async function cerrarSesion() {
+    try {
+      await authClient.signOut();
+      setUser(null);
+      console.log('Logout exitoso. Redirigiendo...');
+      window.location.href = '/';
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error);
+    }
+  }
+
+  if (loading) {
+    return <p>Cargando...</p>;
   }
 
   return (
     <>
-      <button onClick={iniciarLoginConGoogle}>
-        Iniciar sesión con Google
-      </button>
-      <button onClick={cerrarSesion}>
-        Cerrar sesion
-      </button>
-
-      
+      {user ? (
+        <button onClick={cerrarSesion}>Cerrar sesión</button>
+      ) : (
+        <button onClick={iniciarLoginConGoogle}>Iniciar sesión con Google</button>
+      )}
     </>
-  )
+  );
 }
 
-export default App
+export default App;

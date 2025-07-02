@@ -2,9 +2,8 @@ import express from 'express';
 import dotenv from 'dotenv';
 import { pool } from './utils/config.js';
 import { separateInfo } from './utils/methods.js';
-import { toNodeHandler } from 'better-auth/node';
+import { toNodeHandler, fromNodeHeaders } from 'better-auth/node';
 import { auth } from './utils/auth.js';
-import { fromNodeHeaders } from 'better-auth/node';
 import cors from 'cors';
 import { corsOptions, transporter } from './utils/constant.js';
 
@@ -17,22 +16,27 @@ app.use(cors(corsOptions));
 app.all('/api/auth/*', toNodeHandler(auth.handler));
 app.use(express.json());
 
-app.post('/logout', async (req, res) => {
+app.get('/api/me', async (req, res) => {
   try {
-    const response = await auth.api.signOut({
-      headers: fromNodeHeaders(req.headers),
-      returnHeaders: true
+    const requestHeaders = fromNodeHeaders(req.headers)
+    
+    const sessionData = await auth.api.getSession({
+      headers: requestHeaders
     })
 
-    // Aplicar las cabeceras Set-Cookie de la respuesta de Better Auth a la respuesta de Express
-    const setCookieHeaders = response.headers.getSetCookie()
-    if (setCookieHeaders && setCookieHeaders.length > 0) {
-      res.setHeader('Set-Cookie', setCookieHeaders)
+    if (sessionData) {
+      const user = sessionData.user
+      const session = sessionData.session
+      res.json({
+        user,
+        sessionId: session.id
+      })
+    } else {
+      res.send({ error: 'Unauthorized', message: 'No active session found.' })
     }
-
-    res.status(200).json({ message: 'Logged out successfully' })
   } catch (error) {
-    console.error('Logout error:', error)
+    console.error('Error al obtener la sesión en /api/me:', error)
+    res.status(500).json({ error: 'Internal Server Error' })
   }
 })
 
