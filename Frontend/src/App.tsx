@@ -1,6 +1,5 @@
 import { Header } from './components/Chat/Header';
 import { SideBar } from './components/SideBar/SideBar';
-import { useAuth } from './hooks/useAuth';
 
 
 function App() {
@@ -13,11 +12,6 @@ function App() {
           <Header />
         </div>
       </section>
-      {/* {user ? (
-        <button onClick={cerrarSesion}>Cerrar sesión</button>
-      ) : (
-        <button onClick={iniciarLoginConGoogle}>Iniciar sesión con Google</button>
-      )} */}
     </main>
   );
 }
