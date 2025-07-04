@@ -1,7 +1,7 @@
 import { HistoryCard } from './HistoryCard';
 import { SectionCard } from './SectionCard';
 import { Compass, Book, Inbox, History } from "lucide-react";
-import { Separator } from './separator';
+import { Separator } from './Separator';
 import { InputSearch } from './InputSearch';
 
 export function SideBar() {
