@@ -1,6 +1,8 @@
 import { HistoryCard } from './HistoryCard';
 import { SectionCard } from './SectionCard';
 import { Compass, Book, Inbox, History } from "lucide-react";
+import { Separator } from './separator';
+import { InputSearch } from './InputSearch';
 
 export function SideBar() {
   const textTest = [
@@ -17,18 +19,22 @@ export function SideBar() {
   ];
 
   return (
-    <div className="h-full w-1/6 flex flex-col px-3 pt-4 bg-blue-500">
+    <div className="h-full w-1/6 flex flex-col px-4 pt-5 bg-blue-00">
       <div className='h-8 flex items-center mb-4'>
         <img src="/destello.png" alt="Logo" className="h-7 mr-1" />
         <h1 className='font-bold text-xl'>ThunderMail.ai</h1>
       </div>
 
-      <input type="text" className='h-8 rounded-full' />
-      <section className='pl-2'>
+      <section className='pl-1 pr-1 w-full'>
+        <InputSearch />
+        
         {sections.map(({ text, icon: Icon }, index) => (
-          <SectionCard text={text} icon={<Icon className='text-black' />} key={index} />
+          <SectionCard text={text} icon={<Icon className='w-6 h-6 text-black mr-2 stroke-1' />} key={index} />
         ))}
         
+        <Separator />
+
+        <h2 className='text-textBar my-2'>RECENTS CHATS</h2>
         {textTest.map((text, index) => (
           <HistoryCard text={text} key={index} />
         ))}        
