@@ -2,16 +2,7 @@ import { useAuth } from "../../hooks/useAuth";
 import { AccountLogo } from "./AccountLogo";
 import { LoginButton } from "./LoginButton";
 import { LoadingAccount } from "../Loaders/loadingAccount";
-
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  emailVerified: boolean;
-  image: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
+import type { User } from "../../types/interfaces";
 
 export function Header() {
   const { user, loading, handleLogin, handleLogout } = useAuth();

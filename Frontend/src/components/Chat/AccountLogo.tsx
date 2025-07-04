@@ -1,9 +1,4 @@
-import type { User } from './Header';
-
-interface AccountLogoProps {
-  user: User;
-  logoutFunction: () => void;
-}
+import type { AccountLogoProps } from '../../types/interfaces';
 
 export function AccountLogo({ user, logoutFunction }: AccountLogoProps) {
   return (

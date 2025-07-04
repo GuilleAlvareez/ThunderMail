@@ -1,8 +1,4 @@
-
-interface SectionCardProps {
-  text: string;
-  icon: React.ReactNode;
-};
+import type { SectionCardProps } from '../../types/interfaces';
 
 export function SectionCard({ text, icon }: SectionCardProps) {
   return (

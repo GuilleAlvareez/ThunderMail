@@ -1,9 +1,5 @@
 import { MessageCircle } from "lucide-react";
-
-
-interface HistoryCardProps {
-  text: string;
-}
+import type { HistoryCardProps } from '../../types/interfaces';
 
 export function HistoryCard({ text }: HistoryCardProps) {
   return (

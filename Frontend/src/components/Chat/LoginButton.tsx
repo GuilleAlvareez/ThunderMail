@@ -1,6 +1,4 @@
-type LoginButtonProps = {
-  loginFunction: () => void;
-};
+import type { LoginButtonProps } from '../../types/interfaces';
 
 export function LoginButton({ loginFunction }: LoginButtonProps) {
   return (
