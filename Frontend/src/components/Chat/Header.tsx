@@ -30,7 +30,7 @@ export function Header() {
   }
 
   return (
-    <div className="flex justify-end">
+    <div className="flex justify-end mb-4">
       {user ? (
         <div>
           <AccountLogo user={user as User} logoutFunction={logoutSession} />
