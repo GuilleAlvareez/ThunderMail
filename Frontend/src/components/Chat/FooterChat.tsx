@@ -7,10 +7,10 @@ export function FooterChat() {
         <input
           type="text"
           placeholder="Type a message..."
-          className="w-full bg-input rounded-full pl-6 pr-16 py-3 outline-none focus:ring"
+          className="w-full bg-input rounded-full pl-6 pr-16 py-3 outline-none"
         />
 
-        <button className="absolute right-3 top-1/2 -translate-y-1/2 bg-black rounded-full p-2 text-white hover:bg-gray-800 transition">
+        <button className="absolute right-3 top-1/2 -translate-y-1/2 bg-black rounded-full p-1 text-white hover:bg-gray-800 transition">
           <ArrowUp className="w-6 h-6 stroke-2" />
         </button>
       </div>
