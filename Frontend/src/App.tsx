@@ -12,7 +12,7 @@ function App() {
         <div className="h-full w-full grid grid-rows-[auto_1fr_auto] bg-white rounded-4xl p-7 shadow-lg overflow-hidden">
           <Header />
 
-          <div className="overflow-y-auto min-h-0">
+          <div className="overflow-y-auto min-h-0 flex-1">
             <ChatSection />
           </div>
 
