@@ -1,8 +1,16 @@
 import { useAuth } from '../../hooks/useAuth';
+import { TextNoMessages } from './TextNoMessages';
+import { UserMessage } from './UserMessage';
+import { AssistantMessage } from './AssistantMessage';
 import type { User } from '../../types/interfaces';
 
 export function ChatSection() {
   const { user, loading }: { user: User | null; loading: boolean } = useAuth();
+  const messagesTest = [
+    { message: 'Hola como estás?', isUser: true },
+    { message: 'Buenas tardes', isUser: false },
+    { message: '¿Qué tal?', isUser: true },
+  ];
 
   const extractNameUser = (name: string) => {
     const nameArray = name.split(' ');
@@ -15,12 +23,18 @@ export function ChatSection() {
 
   return (
     <div className="h-full w-full flex flex-col">
-      <div className="flex flex-col items-center justify-center gap-4 flex-1">
-        <div className="text-start text-gray-500 mt-8">
-          <p className='text-5xl font-semibold bg-gradient-to-br from-gradientText to-gradientText2 bg-clip-text text-transparent mb-4'>Hello {name}</p>
-          <p className='text-4xl font-semibold text-textNoChat'>How can i help you today?</p>
-        </div>
-      </div>
+      {messagesTest && messagesTest.length > 0 ? (
+        messagesTest.map((msg, index) => (
+          //meter condicional segun isUser o role renderizar un compoente u otro
+          msg.isUser ? (
+            <UserMessage message={msg.message} key={index} />
+          ) : (
+            <AssistantMessage message={msg.message} key={index} />
+          )
+      ))
+      ) : (
+        <TextNoMessages name={name} />
+      )}
     </div>
   );
 }
