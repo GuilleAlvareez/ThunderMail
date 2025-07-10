@@ -36,18 +36,26 @@ app.post('/chat/send-email', async (req, res) => {
 });
 
 app.post('/chat/createText', async (req, res) => {
-  const { prompt, mode } = req.body;
+  const { prompt, style } = req.body;
+
+  if (!prompt || !style) {
+    res.status(400).send('Missing prompt or style');
+    return;
+  }
 
   try {
     const systemPrompt = `
-    You will receive a prompt. From there, identify the recipient of the email, generate an appropriate subject line, and write the body of the message using the ${mode} style.
-    The language of the generated content (subject line and body) must match the language in which the prompt is written.
-    Important: the To:, Subject:, and Content: headers must remain exactly the same and in English, regardless of the language of the content.
+    You will receive a prompt. From it, identify the recipient of the email, generate an appropriate subject line, and write the body of the message using the ${style} style.
 
-    The response must strictly follow the following format:
-    First line: To: followed by the recipient's email address.
-    Second line: Subject: followed by the subject of the email.
-    Third line: Content: followed by the body of the message, which can be spread over several lines if necessary.
+    The language of the generated content — including the subject line and the body — must match the language of the prompt.
+
+    Important: The headers **To**, **Subject**, and **Content** must also appear in the same language as the prompt, and must remain exactly as they are written in that language.
+
+    The response must strictly follow this format:
+
+    First line: "To" (in the same language as the prompt): followed by the recipient's email address.  
+    Second line: "Subject" (in the same language as the prompt): followed by the subject of the email.  
+    Third line: "Content" (in the same language as the prompt): followed by the body of the message, which can span multiple lines if needed.
     `;
 
     const systemMessage = {
@@ -88,6 +96,22 @@ app.post('/chat/createText', async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(500).send('Failed generate text');
+  }
+});
+
+app.get('/chat/:userId/chats', async (req, res) => {
+  const { userId } = req.params;
+  console.log(userId);
+  try {
+    const chats = await pool.query(`
+      SELECT * FROM chat
+      WHERE userid = $1
+    `, [userId]);
+
+    res.send(chats.rows);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send('Failed to get chats');
   }
 });
 
