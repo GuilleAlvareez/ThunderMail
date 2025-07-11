@@ -1,10 +1,10 @@
 import express from 'express';
 import dotenv from 'dotenv';
+import cors from 'cors';
 import { pool } from './utils/config.js';
 import { separateInfo } from './utils/methods.js';
 import { toNodeHandler, fromNodeHeaders } from 'better-auth/node';
 import { auth } from './utils/auth.js';
-import cors from 'cors';
 import { corsOptions, transporter } from './utils/constant.js';
 
 dotenv.config();
@@ -17,9 +17,16 @@ app.all('/api/auth/*', toNodeHandler(auth.handler));
 app.use(express.json());
 
 app.post('/chat/send-email', async (req, res) => {
-  const { to, subject, content } = req.body;
+  const { from, to, subject, content, chatId, userId } = req.body;
 
   try {
+    // Guardamos el mensaje
+    await pool.query(`
+      INSERT INTO messages (idchat, iduser, from, to, content, role)
+      VALUES ($1, $2, $3, $4)
+    `, [chatId, userId, content, from, to, 'user']);
+
+
     await transporter.sendMail({
       from: "guillealvarezmoreno2@gmail.com",
       to: to,
@@ -101,17 +108,68 @@ app.post('/chat/createText', async (req, res) => {
 
 app.get('/chat/:userId/chats', async (req, res) => {
   const { userId } = req.params;
-  console.log(userId);
+
+  if (!userId) return res.status(400).send('Missing userId');
+
   try {
     const chats = await pool.query(`
       SELECT * FROM chat
       WHERE userid = $1
     `, [userId]);
 
+    if (chats.rows.length === 0) {
+      await pool.query(
+        'INSERT INTO chat (userid) VALUES ($1)',
+        [userId]
+      )
+    }
+
     res.send(chats.rows);
   } catch (error) {
     console.log(error);
     res.status(500).send('Failed to get chats');
+  }
+});
+
+app.get('/chat/:userId/:chatId/messages', async (req, res) => {
+  const { userId, chatId } = req.params
+
+  if (!userId || !chatId) {
+    res.status(400).send('Missing userId or chatId');
+    return;
+  }
+
+  try {
+    const messages = await pool.query(`
+      SELECT * FROM messages
+      WHERE idchat = $1 AND iduser = $2
+    `, [chatId, userId]);
+
+    res.send(messages.rows);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send('Failed to get messages');
+  }
+})
+
+app.post('/chat/newMessage', async (req, res) => {
+  const { from, to, subject, content, chatId, userId, role } = req.body;
+
+  if (!from || !to || !subject || !content || !chatId || !userId || !role) {
+    res.status(400).send('Missing data');
+    return;
+  }
+
+  try {
+    await pool.query(`
+      INSERT INTO messages (idchat, iduser, "from", "to", subject, content, role)
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
+    `, [chatId, userId, from, to, subject, content, role]);
+
+    res.send('Message sent');
+  } catch (error) {
+    console.log(error);
+    res.status(500).send('Failed to save message');
   }
 });
 
