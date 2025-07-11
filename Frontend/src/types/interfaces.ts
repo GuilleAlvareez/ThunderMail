@@ -18,7 +18,7 @@ export type LoginButtonProps = {
 };
 
 export interface HistoryCardProps {
-  text: string;
+  id: number;
 }
 
 export interface SectionCardProps {

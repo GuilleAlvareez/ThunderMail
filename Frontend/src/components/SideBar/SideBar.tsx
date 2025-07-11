@@ -3,13 +3,19 @@ import { SectionCard } from './SectionCard';
 import { Compass, Book, Inbox, History } from "lucide-react";
 import { Separator } from './Separator';
 import { InputSearch } from './InputSearch';
+import { useChat } from '../../hooks/useChat';
+import { useEffect } from 'react';
+import { useAuth } from '../../hooks/useAuth';
 
 export function SideBar() {
-  const textTest = [
-    'text1',
-    'text2',
-    'text3',
-  ];
+  const { user } = useAuth();
+  const { chats } = useChat(user?.id);
+
+  // const textTest = [
+  //   'text1',
+  //   'text2',
+  //   'text3',
+  // ];
 
   const sections = [
     { text: "Explore", icon: Compass },
@@ -35,8 +41,8 @@ export function SideBar() {
         <Separator />
 
         <h2 className='text-textBar my-2'>RECENTS CHATS</h2>
-        {textTest.map((text, index) => (
-          <HistoryCard text={text} key={index} />
+        {chats.map(({ idchat }, index) => (
+          <HistoryCard id={idchat} key={index} />
         ))}        
       </section>
     </div>

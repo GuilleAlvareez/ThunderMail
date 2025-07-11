@@ -31,7 +31,6 @@ export const useAuth = () => {
     try {
       setLoading(true);
       const userSession = await authService.userInfo();
-      console.log("userSession", userSession);
       setUser(userSession?.data?.user || null);
     } catch (error) {
       console.error("Error obteniendo info de usuario:", error);
