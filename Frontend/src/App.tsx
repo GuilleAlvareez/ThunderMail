@@ -2,8 +2,12 @@ import { Header } from './components/Chat/Header';
 import { SideBar } from './components/SideBar/SideBar';
 import { FooterChat } from './components/Chat/FooterChat';
 import { ChatSection } from './components/Chat/ChatSection';
+import { useState } from 'react';
 
 function App() {
+  const [prompt, setPrompt] = useState('');
+    console.log("prompt", prompt);
+
   return (
     <main className="h-screen flex gap-1 bg-bg">
       <SideBar />
@@ -13,10 +17,10 @@ function App() {
           <Header />
 
           <div className="overflow-y-auto min-h-0 flex-1">
-            <ChatSection />
+            <ChatSection prompt={prompt} />
           </div>
 
-          <FooterChat />
+          <FooterChat setPrompt={setPrompt} />
         </div>
       </section>
     </main>

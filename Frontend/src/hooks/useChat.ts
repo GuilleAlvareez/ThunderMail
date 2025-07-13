@@ -20,6 +20,17 @@ export function useChat(userId: string) {
     }
   }
 
+  const generateDraft = async (chatId: string) => {
+    try {
+      setLoading(true);
+      setMessages(await ChatService.generateDraft(userId, chatId));
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+      setError(true);
+    }
+  }
+
   useEffect(() => {
     if (!userId) return;
     loadChats();

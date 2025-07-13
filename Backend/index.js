@@ -43,7 +43,7 @@ app.post('/chat/send-email', async (req, res) => {
 });
 
 app.post('/chat/createText', async (req, res) => {
-  const { prompt, style } = req.body;
+  const { prompt, style, userId } = req.body;
 
   if (!prompt || !style) {
     res.status(400).send('Missing prompt or style');
@@ -51,6 +51,18 @@ app.post('/chat/createText', async (req, res) => {
   }
 
   try {
+    const chats = await pool.query(`
+      SELECT * FROM chat
+      WHERE userid = $1
+    `, [userId]);
+
+    if (chats.rows.length === 0) {
+      await pool.query(
+        'INSERT INTO chat (userid) VALUES ($1)',
+        [userId]
+      )
+    }
+
     const systemPrompt = `
     You will receive a prompt. From it, identify the recipient of the email, generate an appropriate subject line, and write the body of the message using the ${style} style.
 
@@ -96,9 +108,8 @@ app.post('/chat/createText', async (req, res) => {
     }
 
     const data = await response.json();
-
     const information = separateInfo(data.choices[0].message.content);
-    // console.log(data.choices[0].message.content);
+    
     res.send(information);
   } catch (error) {
     console.log(error);
@@ -116,13 +127,6 @@ app.get('/chat/:userId/chats', async (req, res) => {
       SELECT * FROM chat
       WHERE userid = $1
     `, [userId]);
-
-    if (chats.rows.length === 0) {
-      await pool.query(
-        'INSERT INTO chat (userid) VALUES ($1)',
-        [userId]
-      )
-    }
 
     res.send(chats.rows);
   } catch (error) {

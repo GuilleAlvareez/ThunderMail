@@ -4,7 +4,7 @@ interface AssistantMessageProps {
 
 export function AssistantMessage({ message }: AssistantMessageProps) {
   return (
-    <div className="flex items-start gap-3 mb-4">
+    <div className="flex items-center gap-3 mb-4">
       <img
         src="/destello.png"
         alt="Assistant Logo"

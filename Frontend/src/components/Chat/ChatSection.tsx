@@ -2,10 +2,14 @@ import { useAuth } from '../../hooks/useAuth';
 import { TextNoMessages } from './TextNoMessages';
 import { UserMessage } from './UserMessage';
 import { AssistantMessage } from './AssistantMessage';
+import { useChat } from '../../hooks/useChat';
 import type { User } from '../../types/interfaces';
+
 
 export function ChatSection() {
   const { user, loading }: { user: User | null; loading: boolean } = useAuth();
+  const { messages, loadChats, generateDraft } = useChat(user?.id);
+
   const messagesTest = [
     { message: 'Hola como estás?', isUser: true },
     { message: 'Buenas tardes', isUser: false },

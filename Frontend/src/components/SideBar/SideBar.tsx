@@ -11,12 +11,6 @@ export function SideBar() {
   const { user } = useAuth();
   const { chats } = useChat(user?.id);
 
-  // const textTest = [
-  //   'text1',
-  //   'text2',
-  //   'text3',
-  // ];
-
   const sections = [
     { text: "Explore", icon: Compass },
     { text: "Libraries", icon: Book },
