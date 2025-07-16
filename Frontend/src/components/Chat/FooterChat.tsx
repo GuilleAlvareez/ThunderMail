@@ -2,12 +2,16 @@ import { ArrowUp } from "lucide-react";
 import { useRef } from 'react';
 import { useChat } from '../../hooks/useChat';
 
-export function FooterChat({ setPrompt }: { setPrompt: (prompt: string) => void }) {
+export function FooterChat({ sendChatMessage, userId }: { sendChatMessage: (prompt: string, userId: string) => void, userId: string }) {
   const refInput = useRef<HTMLInputElement>(null)
 
   function handleSend() {
     const prompt = refInput.current?.value || '';
-    setPrompt(prompt);
+
+    if (prompt.trim()) {
+      sendChatMessage(prompt, userId);
+      refInput.current!.value = '';
+    }
   }
 
   return (

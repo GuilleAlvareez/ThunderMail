@@ -3,9 +3,14 @@ import { SideBar } from './components/SideBar/SideBar';
 import { FooterChat } from './components/Chat/FooterChat';
 import { ChatSection } from './components/Chat/ChatSection';
 import { useState } from 'react';
+import { useChat } from './hooks/useChat';
+import { useAuth } from './hooks/useAuth';
 
 function App() {
   const [prompt, setPrompt] = useState('');
+  const activeChatId = 1;
+  const { user } = useAuth();
+  const { messages, sendChatMessage, handleSendEmail, loading } = useChat(user?.id);
     console.log("prompt", prompt);
 
   return (
@@ -17,10 +22,14 @@ function App() {
           <Header />
 
           <div className="overflow-y-auto min-h-0 flex-1">
-            <ChatSection prompt={prompt} />
+            <ChatSection
+              messages={messages} 
+              onSendEmail={handleSendEmail}
+              loading={loading}
+            />
           </div>
 
-          <FooterChat setPrompt={setPrompt} />
+          <FooterChat sendChatMessage={sendChatMessage} userId={user?.id} />
         </div>
       </section>
     </main>

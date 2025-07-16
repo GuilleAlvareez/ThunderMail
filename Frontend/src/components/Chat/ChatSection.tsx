@@ -3,18 +3,22 @@ import { TextNoMessages } from './TextNoMessages';
 import { UserMessage } from './UserMessage';
 import { AssistantMessage } from './AssistantMessage';
 import { useChat } from '../../hooks/useChat';
-import type { User } from '../../types/interfaces';
+import type { User, Message } from '../../types/interfaces';
 
+interface ChatSectionProps {
+  messages: Message[];
+  onSendEmail: (draftContent: string) => void;
+  loading: boolean;
+}
 
-export function ChatSection() {
-  const { user, loading }: { user: User | null; loading: boolean } = useAuth();
-  const { messages, loadChats, generateDraft } = useChat(user?.id);
+export function ChatSection({ messages, onSendEmail, loading }: ChatSectionProps) {
+  const { user }: { user: User | null; loading: boolean } = useAuth();
 
-  const messagesTest = [
-    { message: 'Hola como estás?', isUser: true },
-    { message: 'Buenas tardes', isUser: false },
-    { message: '¿Qué tal?', isUser: true },
-  ];
+  // const messagesTest = [
+  //   { message: 'Hola como estás?', isUser: true },
+  //   { message: 'Buenas tardes', isUser: false },
+  //   { message: '¿Qué tal?', isUser: true },
+  // ];
 
   const extractNameUser = (name: string) => {
     const nameArray = name.split(' ');
@@ -27,13 +31,13 @@ export function ChatSection() {
 
   return (
     <div className="h-full w-full flex flex-col">
-      {messagesTest && messagesTest.length > 0 ? (
-        messagesTest.map((msg, index) => (
+      {messages && messages.length > 0 ? (
+        messages.map((msg, index) => (
           //meter condicional segun isUser o role renderizar un compoente u otro
-          msg.isUser ? (
-            <UserMessage message={msg.message} key={index} />
+          msg.role === 'user' ? (
+            <UserMessage message={msg.content} key={index} />
           ) : (
-            <AssistantMessage message={msg.message} key={index} />
+            <AssistantMessage message={msg.content} key={index} />
           )
       ))
       ) : (

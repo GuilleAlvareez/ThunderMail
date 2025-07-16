@@ -20,19 +20,18 @@ app.post('/chat/send-email', async (req, res) => {
   const { from, to, subject, content, chatId, userId } = req.body;
 
   try {
-    // Guardamos el mensaje
-    await pool.query(`
-      INSERT INTO messages (idchat, iduser, from, to, content, role)
-      VALUES ($1, $2, $3, $4)
-    `, [chatId, userId, content, from, to, 'user']);
-
-
     await transporter.sendMail({
       from: "guillealvarezmoreno2@gmail.com",
       to: to,
       subject: subject,
       text: content
     });
+
+    // Guardamos el mensaje
+    await pool.query(`
+      INSERT INTO emailsended (idchat, iduser, from, to, content)
+      VALUES ($1, $2, $3, $4)
+    `, [chatId, userId, content, from, to]);
     
     res.send('Email sent');
   } catch (error) {
@@ -43,7 +42,7 @@ app.post('/chat/send-email', async (req, res) => {
 });
 
 app.post('/chat/createText', async (req, res) => {
-  const { prompt, style, userId } = req.body;
+  const { prompt, style = "formal", userId } = req.body;
 
   if (!prompt || !style) {
     res.status(400).send('Missing prompt or style');
@@ -135,6 +134,27 @@ app.get('/chat/:userId/chats', async (req, res) => {
   }
 });
 
+app.post('/chat/newChat', async (req, res) => {
+  const { userId } = req.body;
+
+  if (!userId) {
+    res.status(400).send('Missing userId');
+    return;
+  }
+
+  try {
+    await pool.query(`
+      INSERT INTO chat (userid)
+      VALUES ($1)
+    `, [userId]);
+
+    res.send('Chat created');
+  } catch (error) {
+    console.log(error);
+    res.status(500).send('Failed to create chat');
+  }
+})
+
 app.get('/chat/:userId/:chatId/messages', async (req, res) => {
   const { userId, chatId } = req.params
 
@@ -147,6 +167,7 @@ app.get('/chat/:userId/:chatId/messages', async (req, res) => {
     const messages = await pool.query(`
       SELECT * FROM messages
       WHERE idchat = $1 AND iduser = $2
+      ORDER BY sendat ASC
     `, [chatId, userId]);
 
     res.send(messages.rows);
@@ -157,20 +178,21 @@ app.get('/chat/:userId/:chatId/messages', async (req, res) => {
 })
 
 app.post('/chat/newMessage', async (req, res) => {
-  const { from, to, subject, content, chatId, userId, role } = req.body;
+  const { content, chatId, userId, role } = req.body;
 
-  if (!from || !to || !subject || !content || !chatId || !userId || !role) {
+  if (!content || !chatId || !userId || !role) {
     res.status(400).send('Missing data');
     return;
   }
 
   try {
-    await pool.query(`
-      INSERT INTO messages (idchat, iduser, "from", "to", subject, content, role)
-      VALUES ($1, $2, $3, $4, $5, $6, $7)
-    `, [chatId, userId, from, to, subject, content, role]);
+    const result = await pool.query(`
+      INSERT INTO messages (idchat, iduser, content, role)
+      VALUES ($1, $2, $3, $4)
+      RETURNING *
+    `, [chatId, userId, content, role]);
 
-    res.send('Message sent');
+    res.status(201).json(result.rows[0]);
   } catch (error) {
     console.log(error);
     res.status(500).send('Failed to save message');
