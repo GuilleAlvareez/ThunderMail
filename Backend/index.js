@@ -12,14 +12,19 @@ dotenv.config();
 const app = express();
 
 app.use(cors(corsOptions));
-
 app.all('/api/auth/*', toNodeHandler(auth.handler));
 app.use(express.json());
 
+// Endpoint para enviar email y registrar en emailsended
 app.post('/chat/send-email', async (req, res) => {
   const { from, to, subject, content, chatId, userId } = req.body;
 
+  if (!from || !to || !subject || !content || !chatId || !userId) {
+    return res.status(400).json({ error: 'Missing required fields' });
+  }
+
   try {
+    // Enviar el email
     await transporter.sendMail({
       from: "guillealvarezmoreno2@gmail.com",
       to: to,
@@ -27,41 +32,28 @@ app.post('/chat/send-email', async (req, res) => {
       text: content
     });
 
-    // Guardamos el mensaje
+    // Registrar en emailsended (NO en messages)
     await pool.query(`
-      INSERT INTO emailsended (idchat, iduser, from, to, content)
-      VALUES ($1, $2, $3, $4)
-    `, [chatId, userId, content, from, to]);
+      INSERT INTO emailsended (idchat, iduser, "from", "to", subject, content)
+      VALUES ($1, $2, $3, $4, $5, $6)
+    `, [chatId, userId, from, to, subject, content]);
     
-    res.send('Email sent');
+    res.status(200).json({ message: 'Email sent successfully' });
   } catch (error) {
     console.log(error);
-    res.status(500).send('Failed to send email');
+    res.status(500).json({ error: 'Failed to send email' });
   }
-
 });
 
+// Endpoint para generar borrador (solo genera, no guarda)
 app.post('/chat/createText', async (req, res) => {
   const { prompt, style = "formal", userId } = req.body;
 
-  if (!prompt || !style) {
-    res.status(400).send('Missing prompt or style');
-    return;
+  if (!prompt || !userId) {
+    return res.status(400).json({ error: 'Missing prompt or userId' });
   }
 
   try {
-    const chats = await pool.query(`
-      SELECT * FROM chat
-      WHERE userid = $1
-    `, [userId]);
-
-    if (chats.rows.length === 0) {
-      await pool.query(
-        'INSERT INTO chat (userid) VALUES ($1)',
-        [userId]
-      )
-    }
-
     const systemPrompt = `
     You will receive a prompt. From it, identify the recipient of the email, generate an appropriate subject line, and write the body of the message using the ${style} style.
 
@@ -76,22 +68,13 @@ app.post('/chat/createText', async (req, res) => {
     Third line: "Content" (in the same language as the prompt): followed by the body of the message, which can span multiple lines if needed.
     `;
 
-    const systemMessage = {
-      role: 'system',
-      content: systemPrompt
-    }
-
-    const userMessage = {
-      role: 'user',
-      content: prompt
-    }
-
-    const messages = [systemMessage, userMessage];
-
     const messageToSend = {
       model: process.env.LLM_MODEL,
-      messages: messages
-    }
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: prompt }
+      ]
+    };
 
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
@@ -100,7 +83,7 @@ app.post('/chat/createText', async (req, res) => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(messageToSend)
-    })
+    });
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -109,58 +92,57 @@ app.post('/chat/createText', async (req, res) => {
     const data = await response.json();
     const information = separateInfo(data.choices[0].message.content);
     
-    res.send(information);
+    res.status(200).json(information);
   } catch (error) {
     console.log(error);
-    res.status(500).send('Failed generate text');
+    res.status(500).json({ error: 'Failed to generate text' });
   }
 });
 
+// Endpoint para obtener chats del usuario
 app.get('/chat/:userId/chats', async (req, res) => {
   const { userId } = req.params;
 
-  if (!userId) return res.status(400).send('Missing userId');
+  if (!userId) return res.status(400).json({ error: 'Missing userId' });
 
   try {
     const chats = await pool.query(`
-      SELECT * FROM chat
-      WHERE userid = $1
+      SELECT * FROM chat WHERE userid = $1
     `, [userId]);
 
-    res.send(chats.rows);
+    res.status(200).json(chats.rows);
   } catch (error) {
     console.log(error);
-    res.status(500).send('Failed to get chats');
+    res.status(500).json({ error: 'Failed to get chats' });
   }
 });
 
+// Endpoint para crear nuevo chat
 app.post('/chat/newChat', async (req, res) => {
   const { userId } = req.body;
 
   if (!userId) {
-    res.status(400).send('Missing userId');
-    return;
+    return res.status(400).json({ error: 'Missing userId' });
   }
 
   try {
-    await pool.query(`
-      INSERT INTO chat (userid)
-      VALUES ($1)
+    const result = await pool.query(`
+      INSERT INTO chat (userid) VALUES ($1) RETURNING *
     `, [userId]);
 
-    res.send('Chat created');
+    res.status(201).json(result.rows[0]);
   } catch (error) {
     console.log(error);
-    res.status(500).send('Failed to create chat');
+    res.status(500).json({ error: 'Failed to create chat' });
   }
-})
+});
 
+// Endpoint para obtener mensajes de un chat específico
 app.get('/chat/:userId/:chatId/messages', async (req, res) => {
-  const { userId, chatId } = req.params
+  const { userId, chatId } = req.params;
 
   if (!userId || !chatId) {
-    res.status(400).send('Missing userId or chatId');
-    return;
+    return res.status(400).json({ error: 'Missing userId or chatId' });
   }
 
   try {
@@ -170,19 +152,23 @@ app.get('/chat/:userId/:chatId/messages', async (req, res) => {
       ORDER BY sendat ASC
     `, [chatId, userId]);
 
-    res.send(messages.rows);
+    res.status(200).json(messages.rows);
   } catch (error) {
     console.log(error);
-    res.status(500).send('Failed to get messages');
+    res.status(500).json({ error: 'Failed to get messages' });
   }
-})
+});
 
+// Endpoint para guardar nuevo mensaje en el chat
 app.post('/chat/newMessage', async (req, res) => {
   const { content, chatId, userId, role } = req.body;
 
   if (!content || !chatId || !userId || !role) {
-    res.status(400).send('Missing data');
-    return;
+    return res.status(400).json({ error: 'Missing required fields' });
+  }
+
+  if (!['user', 'assistant'].includes(role)) {
+    return res.status(400).json({ error: 'Invalid role' });
   }
 
   try {
@@ -195,7 +181,7 @@ app.post('/chat/newMessage', async (req, res) => {
     res.status(201).json(result.rows[0]);
   } catch (error) {
     console.log(error);
-    res.status(500).send('Failed to save message');
+    res.status(500).json({ error: 'Failed to save message' });
   }
 });
 

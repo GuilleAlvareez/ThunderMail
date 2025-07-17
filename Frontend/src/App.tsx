@@ -1,17 +1,13 @@
-import { Header } from './components/Chat/Header';
 import { SideBar } from './components/SideBar/SideBar';
-import { FooterChat } from './components/Chat/FooterChat';
+import { Header } from './components/Chat/Header';
 import { ChatSection } from './components/Chat/ChatSection';
-import { useState } from 'react';
-import { useChat } from './hooks/useChat';
+import { FooterChat } from './components/Chat/FooterChat';
 import { useAuth } from './hooks/useAuth';
+import { useChat } from './hooks/useChat';
 
 function App() {
-  const [prompt, setPrompt] = useState('');
-  const activeChatId = 1;
   const { user } = useAuth();
-  const { messages, sendChatMessage, handleSendEmail, loading } = useChat(user?.id);
-    console.log("prompt", prompt);
+  const { messages, sendChatMessage, handleSendEmail, loading } = useChat(user?.id || '');
 
   return (
     <main className="h-screen flex gap-1 bg-bg">
@@ -24,12 +20,12 @@ function App() {
           <div className="overflow-y-auto min-h-0 flex-1">
             <ChatSection
               messages={messages} 
-              onSendEmail={handleSendEmail}
+              onSendEmail={(draftContent) => handleSendEmail(draftContent, user?.email || '')}
               loading={loading}
             />
           </div>
 
-          <FooterChat sendChatMessage={sendChatMessage} userId={user?.id} />
+          <FooterChat sendChatMessage={sendChatMessage} userId={user?.id || ''} />
         </div>
       </section>
     </main>
