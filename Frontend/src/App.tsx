@@ -9,7 +9,8 @@ import { useChat } from './hooks/useChat';
 function App() {
   const { user } = useAuth();
   const [emailStyle, setEmailStyle] = useState("formal");
-  const { messages, sendChatMessage, handleSendEmail, loading } = useChat(user?.id || '', emailStyle);
+  const chatHook = useChat(user?.id || '', emailStyle);
+  const { messages, sendChatMessage, handleSendEmail, loading } = chatHook;
 
   return (
     <main className="h-screen flex gap-1 bg-bg">

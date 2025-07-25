@@ -168,13 +168,38 @@ app.post('/chat/newChat', async (req, res) => {
 
   try {
     const result = await pool.query(`
-      INSERT INTO chat (userid) VALUES ($1) RETURNING *
+      INSERT INTO chat (userid, createdat) VALUES ($1, NOW()) RETURNING *
     `, [userId]);
 
     res.status(201).json(result.rows[0]);
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: 'Failed to create chat' });
+  }
+});
+
+// Endpoint para eliminar chat
+app.delete('/chat/:chatId', async (req, res) => {
+  const { chatId } = req.params;
+
+  if (!chatId) {
+    return res.status(400).json({ error: 'Missing chatId' });
+  }
+
+  try {
+    // Eliminar mensajes del chat primero
+    await pool.query('DELETE FROM messages WHERE idchat = $1', [chatId]);
+    
+    // Eliminar emails enviados del chat
+    await pool.query('DELETE FROM emailsended WHERE idchat = $1', [chatId]);
+    
+    // Eliminar el chat
+    await pool.query('DELETE FROM chat WHERE idchat = $1', [chatId]);
+
+    res.status(200).json({ message: 'Chat deleted successfully' });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: 'Failed to delete chat' });
   }
 });
 

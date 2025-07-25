@@ -1,14 +1,14 @@
 import { ArrowUp } from "lucide-react";
 import { useRef } from 'react';
 
-export function FooterChat({ sendChatMessage, userId }: { sendChatMessage: (prompt: string, userId: string) => void, userId: string }) {
+export function FooterChat({ sendChatMessage, userId }: { sendChatMessage: (prompt: string) => void, userId: string }) {
   const refInput = useRef<HTMLInputElement>(null)
 
   function handleSend() {
     const prompt = refInput.current?.value || '';
 
     if (prompt.trim()) {
-      sendChatMessage(prompt, userId);
+      sendChatMessage(prompt);
       refInput.current!.value = '';
     }
   }

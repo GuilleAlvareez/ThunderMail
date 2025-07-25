@@ -4,7 +4,7 @@ import type { Message, EmailData } from "../types/interfaces";
 
 export function useChat(userId: string, style: string = "formal") {
   const [chats, setChats] = useState([]);
-  const [currentChatId, setCurrentChatId] = useState<number>(1);
+  const [currentChatId, setCurrentChatId] = useState<number | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -18,12 +18,13 @@ export function useChat(userId: string, style: string = "formal") {
       const userChats = await ChatService.getChats(userId);
       setChats(userChats);
       
-      // Si no hay chats, crear uno nuevo
+      // Si no hay chats, crear uno nuevo automáticamente
       if (userChats.length === 0) {
         const newChat = await ChatService.createNewChat(userId);
         setChats([newChat]);
         setCurrentChatId(newChat.idchat);
-      } else {
+      } else if (!currentChatId) {
+        // Si hay chats pero no hay uno seleccionado, seleccionar el primero
         setCurrentChatId(userChats[0].idchat);
       }
     } catch (error) {
@@ -142,20 +143,63 @@ export function useChat(userId: string, style: string = "formal") {
     if (!userId) return;
 
     try {
+      setLoading(true);
       const newChat = await ChatService.createNewChat(userId);
-      setChats(prev => [...prev, newChat]);
+      setChats(prev => [newChat, ...prev]); // Agregar al inicio
       setCurrentChatId(newChat.idchat);
-      setMessages([]);
+      setMessages([]); // Limpiar mensajes
+      setError(null); // Limpiar errores
     } catch (error) {
       console.error('Error creating chat:', error);
       setError('Failed to create chat');
+    } finally {
+      setLoading(false);
     }
   };
 
   // Cambiar chat activo
   const switchToChat = async (chatId: number) => {
+    if (chatId === currentChatId) return; // No hacer nada si ya es el chat activo
+    
     setCurrentChatId(chatId);
-    await loadMessages(chatId);
+    setMessages([]); // Limpiar mensajes inmediatamente
+    setLoading(true);
+    
+    try {
+      await loadMessages(chatId);
+    } catch (error) {
+      console.error('Error switching chat:', error);
+      setError('Failed to switch chat');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Eliminar chat
+  const deleteChat = async (chatId: number) => {
+    if (!userId) return;
+
+    try {
+      await ChatService.deleteChat(chatId);
+      
+      // Actualizar lista de chats
+      const updatedChats = chats.filter(chat => chat.idchat !== chatId);
+      setChats(updatedChats);
+      
+      // Si el chat eliminado era el activo, cambiar a otro
+      if (currentChatId === chatId) {
+        if (updatedChats.length > 0) {
+          setCurrentChatId(updatedChats[0].idchat);
+          await loadMessages(updatedChats[0].idchat);
+        } else {
+          // Si no hay más chats, crear uno nuevo
+          await createNewChat();
+        }
+      }
+    } catch (error) {
+      console.error('Error deleting chat:', error);
+      setError('Failed to delete chat');
+    }
   };
 
   // Cargar chats al montar el componente
@@ -182,6 +226,7 @@ export function useChat(userId: string, style: string = "formal") {
     handleSendEmail,
     createNewChat,
     switchToChat,
+    deleteChat,
     loadChats,
     loadMessages
   };

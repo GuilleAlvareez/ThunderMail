@@ -61,5 +61,16 @@ export const ChatService = {
 
     if (!response.ok) throw new Error('Failed to create chat');
     return await response.json();
+  },
+
+  // Eliminar chat
+  deleteChat: async (chatId: number) => {
+    const response = await fetch(`http://localhost:3000/chat/${chatId}`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' }
+    });
+
+    if (!response.ok) throw new Error('Failed to delete chat');
+    return await response.json();
   }
 };

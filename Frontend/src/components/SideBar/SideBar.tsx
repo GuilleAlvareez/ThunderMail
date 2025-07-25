@@ -4,15 +4,22 @@ import { Compass, Book, Inbox, History } from "lucide-react";
 import { Separator } from './Separator';
 import { InputSearch } from './InputSearch';
 import { useChat } from '../../hooks/useChat';
-import { useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 
 export function SideBar() {
   const { user } = useAuth();
-  const { chats } = useChat(user?.id);
+  const { chats, currentChatId, createNewChat, switchToChat } = useChat(user?.id || '');
+
+  const handleNewChat = async () => {
+    await createNewChat();
+  };
+
+  const handleSwitchChat = async (chatId: number) => {
+    await switchToChat(chatId);
+  };
 
   const sections = [
-    { text: "New Chat", icon: Compass },
+    { text: "New Chat", icon: Compass, onClick: handleNewChat },
     { text: "Libraries", icon: Book },
     { text: "Files", icon: Inbox },
     { text: "History", icon: History },
@@ -28,15 +35,25 @@ export function SideBar() {
       <section className='pl-1 pr-1 w-full'>
         <InputSearch />
         
-        {sections.map(({ text, icon: Icon }, index) => (
-          <SectionCard text={text} icon={<Icon className='w-6 h-6 text-black mr-2 stroke-1' />} key={index} />
+        {sections.map(({ text, icon: Icon, onClick }, index) => (
+          <SectionCard 
+            text={text} 
+            icon={<Icon className='w-6 h-6 text-black mr-2 stroke-1' />} 
+            key={index}
+            onClick={onClick}
+          />
         ))}
         
         <Separator />
 
-        <h2 className='text-textBar my-2'>RECENTS CHATS</h2>
-        {chats.map(({ idchat }, index) => (
-          <HistoryCard id={idchat} key={index} />
+        <h2 className='text-textBar my-2'>RECENT CHATS</h2>
+        {chats.map((chat) => (
+          <HistoryCard 
+            id={chat.idchat} 
+            key={chat.idchat}
+            isActive={chat.idchat === currentChatId}
+            onClick={() => handleSwitchChat(chat.idchat)}
+          />
         ))}        
       </section>
     </div>

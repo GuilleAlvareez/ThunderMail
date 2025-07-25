@@ -19,11 +19,14 @@ export type LoginButtonProps = {
 
 export interface HistoryCardProps {
   id: number;
+  isActive?: boolean;
+  onClick?: () => void;
 }
 
 export interface SectionCardProps {
   text: string;
   icon: React.ReactNode;
+  onClick?: () => void;
 }
 
 export interface Message {
