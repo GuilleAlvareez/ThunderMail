@@ -151,7 +151,7 @@ app.get('/chat/:userId/chats', async (req, res) => {
       SELECT * FROM chat WHERE userid = $1
     `, [userId]);
 
-    res.status(200).json(chats.rows);
+    res.status(200).json(chats.rows.reverse());
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: 'Failed to get chats' });

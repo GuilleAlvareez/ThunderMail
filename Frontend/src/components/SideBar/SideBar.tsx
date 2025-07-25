@@ -1,28 +1,31 @@
 import { HistoryCard } from './HistoryCard';
 import { SectionCard } from './SectionCard';
-import { Compass, Book, Inbox, History } from "lucide-react";
+import { CirclePlus, Book, Inbox, History } from "lucide-react";
 import { Separator } from './Separator';
 import { InputSearch } from './InputSearch';
-import { useChat } from '../../hooks/useChat';
-import { useAuth } from '../../hooks/useAuth';
+import { useChatContext } from '../../context/ChatContext';
 
 export function SideBar() {
-  const { user } = useAuth();
-  const { chats, currentChatId, createNewChat, switchToChat } = useChat(user?.id || '');
+  // Usar el contexto para obtener el estado y las funciones del chat
+  const { chats, currentChatId, createNewChat, switchToChat } = useChatContext();
 
-  const handleNewChat = async () => {
-    await createNewChat();
+  // *** CORRECCIÓN CLAVE ***
+  // La función ya no necesita ser `async`
+  const handleNewChat = () => {
+    createNewChat();
   };
 
-  const handleSwitchChat = async (chatId: number) => {
-    await switchToChat(chatId);
+  // *** CORRECCIÓN CLAVE ***
+  // La función ya no necesita ser `async`
+  const handleSwitchChat = (chatId: number) => {
+    switchToChat(chatId);
   };
 
   const sections = [
-    { text: "New Chat", icon: Compass, onClick: handleNewChat },
-    { text: "Libraries", icon: Book },
-    { text: "Files", icon: Inbox },
-    { text: "History", icon: History },
+    { text: "New Chat", icon: CirclePlus, onClick: handleNewChat },
+    // { text: "Libraries", icon: Book },
+    // { text: "Files", icon: Inbox },
+    // { text: "History", icon: History },
   ];
 
   return (

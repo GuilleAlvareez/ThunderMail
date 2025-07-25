@@ -57,6 +57,7 @@ export function Header({ onStyleChange }: HeaderProps) {
           <SelectItem value="formal">Formal</SelectItem>
           <SelectItem value="direct">Direct</SelectItem>
           <SelectItem value="informal">Informal</SelectItem>
+          <SelectItem value="funny">Funny</SelectItem>
         </SelectContent>
       </Select>
       {user ? (

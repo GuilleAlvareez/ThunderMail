@@ -4,13 +4,19 @@ import { Header } from './components/Chat/Header';
 import { ChatSection } from './components/Chat/ChatSection';
 import { FooterChat } from './components/Chat/FooterChat';
 import { useAuth } from './hooks/useAuth';
-import { useChat } from './hooks/useChat';
+import { useChatContext } from './context/ChatContext';
 
 function App() {
   const { user } = useAuth();
   const [emailStyle, setEmailStyle] = useState("formal");
-  const chatHook = useChat(user?.id || '', emailStyle);
-  const { messages, sendChatMessage, handleSendEmail, loading } = chatHook;
+
+  // Usar el contexto para obtener el estado y las funciones del chat
+  const { messages, sendChatMessage, handleSendEmail, loading } = useChatContext();
+
+  // La función de envío de mensajes ahora necesita el estilo
+  const handleSendMessage = (prompt: string) => {
+    sendChatMessage(prompt, emailStyle);
+  };
 
   return (
     <main className="h-screen flex gap-1 bg-bg">
@@ -28,7 +34,7 @@ function App() {
             />
           </div>
 
-          <FooterChat sendChatMessage={sendChatMessage} userId={user?.id || ''} />
+          <FooterChat sendChatMessage={handleSendMessage} userId={user?.id || ''} />
         </div>
       </section>
     </main>
