@@ -20,12 +20,20 @@ export function AssistantMessage({ message, onSendEmail }: AssistantMessageProps
           </p>
         </div>
         {isDraft && onSendEmail && (
-          <button
-            onClick={() => onSendEmail(message)}
-            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
-          >
-            Enviar Email
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => onSendEmail(message)}
+              className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+            >
+              Edit Draft
+            </button>
+            <button
+              onClick={() => onSendEmail(message)}
+              className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+            >
+              Send Mail
+            </button>
+          </div>
         )}
       </div>
     </div>

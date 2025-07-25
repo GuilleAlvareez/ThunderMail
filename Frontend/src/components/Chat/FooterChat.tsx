@@ -1,6 +1,5 @@
 import { ArrowUp } from "lucide-react";
 import { useRef } from 'react';
-import { useChat } from '../../hooks/useChat';
 
 export function FooterChat({ sendChatMessage, userId }: { sendChatMessage: (prompt: string, userId: string) => void, userId: string }) {
   const refInput = useRef<HTMLInputElement>(null)
@@ -28,7 +27,7 @@ export function FooterChat({ sendChatMessage, userId }: { sendChatMessage: (prom
             }
           }}
         />
-
+        
         <button onClick={handleSend} className="absolute right-3 top-1/2 -translate-y-1/2 bg-black rounded-full p-1 text-white hover:bg-gray-800 transition">
           <ArrowUp className="w-6 h-6 stroke-2" />
         </button>

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { SideBar } from './components/SideBar/SideBar';
 import { Header } from './components/Chat/Header';
 import { ChatSection } from './components/Chat/ChatSection';
@@ -7,7 +8,8 @@ import { useChat } from './hooks/useChat';
 
 function App() {
   const { user } = useAuth();
-  const { messages, sendChatMessage, handleSendEmail, loading } = useChat(user?.id || '');
+  const [emailStyle, setEmailStyle] = useState("formal");
+  const { messages, sendChatMessage, handleSendEmail, loading } = useChat(user?.id || '', emailStyle);
 
   return (
     <main className="h-screen flex gap-1 bg-bg">
@@ -15,7 +17,7 @@ function App() {
 
       <section className="h-full w-full p-5">
         <div className="h-full w-full grid grid-rows-[auto_1fr_auto] bg-white rounded-4xl p-7 shadow-lg overflow-hidden">
-          <Header />
+          <Header onStyleChange={setEmailStyle} />
 
           <div className="overflow-y-auto min-h-0 flex-1">
             <ChatSection

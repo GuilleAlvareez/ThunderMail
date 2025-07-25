@@ -15,12 +15,12 @@ export const ChatService = {
     return await response.json();
   },
 
-  // Generar borrador usando IA (no guarda en BD)
-  generateDraft: async (prompt: string, userId: string, style: string = "formal") => {
+  // Generar borrador usando IA (con memoria de conversación)
+  generateDraft: async (prompt: string, userId: string, chatId: number, style: string = "formal") => {
     const response = await fetch(`http://localhost:3000/chat/createText`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt, style, userId })
+      body: JSON.stringify({ prompt, style, userId, chatId })
     });
 
     if (!response.ok) throw new Error('Failed to generate draft');

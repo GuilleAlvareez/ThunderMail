@@ -45,35 +45,67 @@ app.post('/chat/send-email', async (req, res) => {
   }
 });
 
-// Endpoint para generar borrador (solo genera, no guarda)
+// Endpoint para generar borrador (con memoria de conversación)
 app.post('/chat/createText', async (req, res) => {
-  const { prompt, style = "formal", userId } = req.body;
+  const { prompt, style, userId, chatId } = req.body;
 
-  if (!prompt || !userId) {
-    return res.status(400).json({ error: 'Missing prompt or userId' });
+  if (!prompt || !userId || !chatId) {
+    return res.status(400).json({ error: 'Missing prompt, userId or chatId' });
   }
 
   try {
+    // Obtener mensajes anteriores del chat para contexto
+    const previousMessages = await pool.query(`
+      SELECT content, role FROM messages
+      WHERE idchat = $1 AND iduser = $2
+      ORDER BY sendat ASC
+    `, [chatId, userId]);
+
     const systemPrompt = `
-    You will receive a prompt. From it, identify the recipient of the email, generate an appropriate subject line, and write the body of the message using the ${style} style.
+    You will receive a prompt written by the user. Based on that prompt, perform the following tasks:
 
-    The language of the generated content — including the subject line and the body — must match the language of the prompt.
+    1. Identify the recipient of the email (e.g., their email address or full name).
 
-    Important: The headers **To**, **Subject**, and **Content** must also appear in the same language as the prompt, and must remain exactly as they are written in that language.
+    2. Generate an appropriate subject line based on the content and purpose.
 
-    The response must strictly follow this format:
+    3. Write the body of the email using the ${style} provided.
 
-    First line: "To" (in the same language as the prompt): followed by the recipient's email address.  
-    Second line: "Subject" (in the same language as the prompt): followed by the subject of the email.  
-    Third line: "Content" (in the same language as the prompt): followed by the body of the message, which can span multiple lines if needed.
+    4. Extract and use all relevant and usable information from the prompt.
+
+    5. The language of the entire output — including subject line and body — must match the language of the prompt exactly.
+
+    6.IMPORTANT: Do not use placeholders such as [Your Name]. If you don't have the name to the person send the mail and you need it to writte the email, ask the user directly instead with an unstructured message asking for that information — do not follow the output format in that case.
+
+    7. Only when all necessary information is available, follow this exact format, and use the same language as the prompt:
+    To: [recipient email address]  
+    Subject: [email subject line]  
+    Content:
+
+    [email body written in the specified style]
+    (If the prompt is in Spanish, use Para, Asunto, and Contenido. Match the prompt language exactly for these headers.)
+
+    ⚠️ If any required information is missing, break the format and respond with a clear, conversational message asking the user for what’s missing — in the same language as the prompt.
     `;
+
+    // Construir el array de mensajes con contexto
+    const messages = [
+      { role: 'system', content: systemPrompt }
+    ];
+
+    // Agregar mensajes anteriores como contexto
+    previousMessages.rows.forEach(msg => {
+      messages.push({
+        role: msg.role,
+        content: msg.content
+      });
+    });
+
+    // Agregar el prompt actual del usuario
+    messages.push({ role: 'user', content: prompt });
 
     const messageToSend = {
       model: process.env.LLM_MODEL,
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: prompt }
-      ]
+      messages: messages
     };
 
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
@@ -90,9 +122,18 @@ app.post('/chat/createText', async (req, res) => {
     }
 
     const data = await response.json();
-    const information = separateInfo(data.choices[0].message.content);
+    const aiResponse = data.choices[0].message.content;
     
-    res.status(200).json(information);
+    // Intentar separar la información como email estructurado
+    const information = separateInfo(aiResponse);
+    
+    // Si separateInfo devuelve null, significa que no es un email estructurado
+    // En ese caso, devolver el texto plano directamente
+    if (information === null) {
+      res.status(200).json(aiResponse);
+    } else {
+      res.status(200).json(information);
+    }
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: 'Failed to generate text' });

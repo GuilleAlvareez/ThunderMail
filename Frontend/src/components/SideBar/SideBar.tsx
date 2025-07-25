@@ -12,7 +12,7 @@ export function SideBar() {
   const { chats } = useChat(user?.id);
 
   const sections = [
-    { text: "Explore", icon: Compass },
+    { text: "New Chat", icon: Compass },
     { text: "Libraries", icon: Book },
     { text: "Files", icon: Inbox },
     { text: "History", icon: History },

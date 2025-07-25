@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { ChatService } from "../services/ChatService";
 import type { Message, EmailData } from "../types/interfaces";
 
-export function useChat(userId: string) {
+export function useChat(userId: string, style: string = "formal") {
   const [chats, setChats] = useState([]);
   const [currentChatId, setCurrentChatId] = useState<number>(1);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -69,11 +69,19 @@ export function useChat(userId: string) {
       setMessages(prev => [...prev, savedUserMessage]);
       setLoading(true);
 
-      // 3. Generar borrador con IA
-      const draft = await ChatService.generateDraft(prompt, userId);
+      // 3. Generar borrador con IA (ahora con memoria y estilo)
+      const draft = await ChatService.generateDraft(prompt, userId, currentChatId, style);
       
-      // 4. Formatear y guardar respuesta del asistente
-      const assistantContent = `To: ${draft.to}\nSubject: ${draft.subject}\nContent:\n${draft.content}`;
+      // 4. Verificar si la respuesta es un email estructurado o texto plano
+      let assistantContent;
+      
+      if (typeof draft === 'object' && draft.to && draft.subject && draft.content !== undefined) {
+        // Es un email estructurado
+        assistantContent = `To: ${draft.to}\nSubject: ${draft.subject}\nContent:\n${draft.content}`;
+      } else {
+        // Es texto plano (pregunta de la IA o respuesta conversacional)
+        assistantContent = typeof draft === 'string' ? draft : JSON.stringify(draft);
+      }
       
       const assistantMessage = {
         content: assistantContent,
