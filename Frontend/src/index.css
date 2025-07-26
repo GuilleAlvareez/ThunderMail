@@ -16,6 +16,13 @@
   --color-gradientText: #c66bf3;
   --color-gradientText2: #f9baad;
   --color-textNoChat: #cccccc;
+
+  --color-thunder-purple: #8B5CF6;
+  --color-thunder-purple-light: #A78BFA;
+  --color-thunder-purple-dark: #7C3AED;
+  --color-thunder-bg: #F8FAFC;
+  --color-thunder-gray: #64748B;
+  --color-thunder-border: #E2E8F0;
 }
 
 @theme inline {
