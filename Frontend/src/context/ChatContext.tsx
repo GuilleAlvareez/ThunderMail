@@ -13,6 +13,15 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const chatLogic = useChat(user?.id || ''); // El hook se llama UNA SOLA VEZ aquí
 
+  // Si no hay usuario, no renderizar el provider aún
+  if (!user?.id) {
+    return (
+      <ChatContext.Provider value={undefined}>
+        {children}
+      </ChatContext.Provider>
+    );
+  }
+
   return (
     <ChatContext.Provider value={chatLogic}>
       {children}
@@ -24,7 +33,19 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 export function useChatContext() {
   const context = useContext(ChatContext);
   if (context === undefined) {
-    throw new Error('useChatContext must be used within a ChatProvider');
+    // Retornar valores por defecto cuando no hay usuario autenticado
+    return {
+      chats: [],
+      messages: [],
+      loading: false,
+      error: null,
+      currentChatId: null,
+      sendChatMessage: async () => {},
+      handleSendEmail: async () => {},
+      createNewChat: async () => {},
+      switchToChat: () => {},
+      deleteChat: async () => {},
+    };
   }
   return context;
 }

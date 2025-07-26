@@ -38,15 +38,14 @@ export function ChatSection({ messages, onSendEmail, loading }: ChatSectionProps
       {messages.length > 0 ? (
         messages.map((msg, index) =>
           msg.role === 'user' ? (
-            <div>
-              <UserMessage message={msg.content} key={index} />
+            <div key={index}>
+              <UserMessage message={msg.content} />
               <div ref={endRef}/>
             </div>
           ) : (
-            <div>
+            <div key={index}>
               <AssistantMessage
                 message={msg.content}
-                key={index}
                 onSendEmail={onSendEmail}
               />
               <div />

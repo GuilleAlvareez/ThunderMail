@@ -56,31 +56,37 @@ export function useChat(userId: string) {
   const sendChatMessage = async (prompt: string, messageStyle: string) => {
     if (!prompt.trim() || !userId || !currentChatId) return;
 
+    setLoading(true);
+
     try {
+      // 1. Crear y guardar el mensaje del usuario en la BD primero
       const userMessage = { content: prompt, chatId: currentChatId, userId: userId, role: "user" as const };
-      setMessages(prev => [...prev, userMessage]); // Actualización optimista
-      setLoading(true);
+      const savedUserMessage = await ChatService.saveChatMessage(userMessage);
 
-      // Guardamos el mensaje del usuario en la BD
-      await ChatService.saveChatMessage(userMessage);
+      // 2. Actualizar el estado con el mensaje del usuario guardado (con ID correcto)
+      setMessages(prev => [...prev, savedUserMessage]);
 
+      // 3. Generar la respuesta del asistente
       const draft = await ChatService.generateDraft(prompt, userId, currentChatId, messageStyle);
-      
+
       let assistantContent;
       if (typeof draft === 'object' && draft.to && draft.subject && draft.content !== undefined) {
         assistantContent = `To: ${draft.to}\nSubject: ${draft.subject}\nContent:\n${draft.content}`;
       } else {
         assistantContent = typeof draft === 'string' ? draft : JSON.stringify(draft);
       }
-      
+
+      // 4. Crear y guardar el mensaje del asistente en la BD
       const assistantMessage = { content: assistantContent, chatId: currentChatId, userId: userId, role: "assistant" as const };
       const savedAssistantMessage = await ChatService.saveChatMessage(assistantMessage);
-      
-      setMessages(prev => [...prev.slice(0, -1), savedAssistantMessage]); // Reemplazamos el mensaje optimista con el guardado
+
+      // 5. Actualizar el estado agregando el mensaje del asistente guardado
+      setMessages(prev => [...prev, savedAssistantMessage]);
 
     } catch (error) {
       console.error('Error sending message:', error);
       setError('Failed to send message');
+      // En caso de error, no necesitamos remover nada porque no hicimos actualización optimista
     } finally {
       setLoading(false);
     }
@@ -114,7 +120,9 @@ export function useChat(userId: string) {
     if (!userId) return;
 
     try {
-      setLoading(true);
+      if (!isInitialLoad) {
+        setLoading(true);
+      }
       const newChat = await ChatService.createNewChat(userId);
       setChats(prev => [newChat, ...prev]);
       setCurrentChatId(newChat.idchat);
