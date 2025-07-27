@@ -52,7 +52,7 @@ app.post('/chat/createText', async (req, res) => {
   if (!prompt || !userId || !chatId) {
     return res.status(400).json({ error: 'Missing prompt, userId or chatId' });
   }
-
+  console.log(style)
   try {
     // Obtener mensajes anteriores del chat para contexto
     const previousMessages = await pool.query(`
@@ -68,7 +68,7 @@ app.post('/chat/createText', async (req, res) => {
 
     2. Generate an appropriate subject line based on the content and purpose.
 
-    3. Write the body of the email using the ${style} provided.
+    3. Write the body of the email using a style ${style}.
 
     4. Extract and use all relevant and usable information from the prompt.
 

@@ -27,7 +27,6 @@ export function separateInfo(text) {
     content = lineas.slice(contentIndex + 1).join('\n').trim();
   }
 
-  console.log(to, subject, content);
   return { 
     to: to,
     subject: subject,
