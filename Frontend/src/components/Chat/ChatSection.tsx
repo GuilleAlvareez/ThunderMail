@@ -2,6 +2,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { TextNoMessages } from './TextNoMessages';
 import { UserMessage } from './UserMessage';
 import { AssistantMessage } from './AssistantMessage';
+import { UserMessageSkeleton, AssistantMessageSkeleton } from '../Loaders/MessageSkeleton';
 import { useEffect, useRef } from 'react';
 import type { User, Message } from '../../types/interfaces';
 import './styles/ChatSection.css';
@@ -31,7 +32,15 @@ export function ChatSection({ messages, onSendEmail, loading }: ChatSectionProps
     scrollToBottom();
   }, [messages]);
 
-  if (loading && messages.length === 0) return <p>Cargando...</p>;
+  if (loading && messages.length === 0) {
+    return (
+      <div className="h-full w-full flex flex-col">
+        <UserMessageSkeleton />
+        <AssistantMessageSkeleton />
+        <div ref={endRef}/>
+      </div>
+    );
+  }
 
   return (
      <div className="h-full w-full flex flex-col">
@@ -55,7 +64,12 @@ export function ChatSection({ messages, onSendEmail, loading }: ChatSectionProps
       ) : (
         <TextNoMessages name={name} />
       )}
-      {loading && <p className="text-center text-gray-500">Generando respuesta...</p>}
+      {loading && (
+        <>
+          <AssistantMessageSkeleton />
+          <div ref={endRef}/>
+        </>
+      )}
     </div>
   );
 }

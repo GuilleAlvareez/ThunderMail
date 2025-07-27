@@ -1,6 +1,6 @@
 import type { AccountLogoProps } from '../../types/interfaces';
 
-export function AccountLogo({ user, logoutFunction }: AccountLogoProps) {
+export function AccountLogo({ user }: AccountLogoProps) {
   return (
     <div className="flex items-center justify-center">
       <section className='flex flex-col text-end'>
