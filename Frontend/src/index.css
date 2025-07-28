@@ -23,6 +23,35 @@
   --color-thunder-bg: #F8FAFC;
   --color-thunder-gray: #64748B;
   --color-thunder-border: #E2E8F0;
+
+  --animate-increaseHeight: increaseHeight .17s ease-in-out;
+  --animate-decreaseHeight: decreaseHeight .17s ease-in-out;
+
+  @keyframes increaseHeight {
+    0% {
+      max-height: 0;
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    100% {
+      max-height: 100px; /* Ajusta según tu contenido */
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes decreaseHeight {
+    0% {
+      max-height: 100px;
+      opacity: 1;
+      transform: translateY(0);
+    }
+    100% {
+      max-height: 0;
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+  }
 }
 
 @theme inline {

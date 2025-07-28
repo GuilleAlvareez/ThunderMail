@@ -1,13 +1,51 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { ChatService } from "../services/ChatService";
 import type { Message, EmailData } from "../types/interfaces";
 
 export function useChat(userId: string) {
-  const [chats, setChats] = useState<any[]>([]); // Se corrigió el tipo para que coincida con el uso
+  const [chats, setChats] = useState<any[]>([]);
   const [currentChatId, setCurrentChatId] = useState<number | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string>("");
+
+  // Filtrar chats basado en la búsqueda
+  const filteredChats = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return chats;
+    }
+
+    const query = searchQuery.toLowerCase().trim();
+    return chats.filter(chat => {
+      // Filtrar por ID del chat (búsqueda parcial)
+      const chatIdMatch = chat.idchat.toString().toLowerCase().includes(query);
+      
+      // Filtrar por nombre del chat (si existe)
+      const chatNameMatch = chat.name?.toLowerCase().includes(query) || false;
+      
+      // Filtrar por "Chat X" donde X es el ID
+      const chatLabelMatch = `chat ${chat.idchat}`.toLowerCase().includes(query);
+      
+      // Filtrar por fecha de creación (diferentes formatos)
+      const date = new Date(chat.createdat);
+      const dateFormats = [
+        date.toLocaleDateString().toLowerCase(),
+        date.toDateString().toLowerCase(),
+        date.getFullYear().toString(),
+        date.getMonth() + 1 + '/' + date.getDate(),
+        date.getDate() + '/' + (date.getMonth() + 1)
+      ];
+      const dateMatch = dateFormats.some(format => format.includes(query));
+      
+      return chatIdMatch || chatNameMatch || chatLabelMatch || dateMatch;
+    });
+  }, [chats, searchQuery]);
+
+  // Función para actualizar la búsqueda
+  const updateSearchQuery = useCallback((query: string) => {
+    setSearchQuery(query);
+  }, []);
 
   // Cargar mensajes de un chat específico
   // Usamos useCallback para evitar que la función se recree innecesariamente
@@ -188,11 +226,13 @@ export function useChat(userId: string) {
   }, [currentChatId, userId, loadMessages]);
 
   return {
-    chats,
+    chats: filteredChats,
     messages,
     loading,
     error,
     currentChatId,
+    searchQuery,
+    updateSearchQuery,
     sendChatMessage,
     handleSendEmail,
     createNewChat,

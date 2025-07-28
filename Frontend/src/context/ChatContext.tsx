@@ -33,13 +33,14 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 export function useChatContext() {
   const context = useContext(ChatContext);
   if (context === undefined) {
-    // Retornar valores por defecto cuando no hay usuario autenticado
     return {
       chats: [],
       messages: [],
       loading: false,
       error: null,
       currentChatId: null,
+      searchQuery: "",
+      updateSearchQuery: () => {},
       sendChatMessage: async () => {},
       handleSendEmail: async () => {},
       createNewChat: async () => {},
@@ -49,3 +50,4 @@ export function useChatContext() {
   }
   return context;
 }
+

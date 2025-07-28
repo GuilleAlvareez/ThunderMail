@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import { AccountLogo } from "./AccountLogo";
 import { LoginButton } from "./LoginButton";
@@ -21,9 +21,24 @@ export function Header({ onStyleChange }: HeaderProps) {
   const [selectedStyle, setSelectedStyle] = useState("formal");
 
   function handleStyleChange(value: string) {
+    // Crear los parámetros de la URL
+    const params = new URLSearchParams();
+    params.append("style", value);
+
+    // Actualizar la URL sin recargar la página
+    const newURL = `${window.location.pathname}?${params.toString()}`;
+    window.history.replaceState({}, "", newURL);
+
     setSelectedStyle(value);
     onStyleChange(value);
   }
+
+  useEffect(() => {
+    // Obtener el parámetro "style" de la URL
+    const params = new URLSearchParams(window.location.search);
+    const style = params.get("style") || "formal";
+    setSelectedStyle(style);
+  }, []) 
 
   function loginWithGoogle() {
     handleLogin();
