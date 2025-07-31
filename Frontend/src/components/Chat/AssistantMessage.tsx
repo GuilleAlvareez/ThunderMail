@@ -26,7 +26,7 @@ export function AssistantMessage({ message, onSendEmail, sendingEmail = false }:
   }, [message, isDraft]);
   
   return (
-    <div className="flex items-start gap-3 mb-4">
+    <div className="flex items-start gap-3">
       <img
         src="/destello.png"
         alt="Assistant Logo"

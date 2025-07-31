@@ -77,12 +77,19 @@ export function useChat(userId: string) {
       const userChats = await ChatService.getChats(userId);
       setChats(userChats);
       
-      if (userChats.length > 0 && !currentChatId) {
+      // Obtener chatId de la URL
+      const params = new URLSearchParams(window.location.search);
+      const chatIdFromUrl = params.get("chat");
+      
+      if (chatIdFromUrl && userChats.some(chat => chat.idchat === parseInt(chatIdFromUrl))) {
+        // Si hay un chat válido en la URL, seleccionarlo
+        setCurrentChatId(parseInt(chatIdFromUrl));
+      } else if (userChats.length > 0 && !currentChatId) {
         // Si hay chats pero no hay uno seleccionado, seleccionar el primero
         setCurrentChatId(userChats[0].idchat);
       } else if (userChats.length === 0) {
         // Si no hay chats, crear uno nuevo
-        await createNewChat(true); // Pasamos un flag para indicar que es la carga inicial
+        await createNewChat(true);
       }
     } catch (error) {
       console.error('Error loading chats:', error);
@@ -171,6 +178,12 @@ export function useChat(userId: string) {
       setCurrentChatId(newChat.idchat);
       setMessages([]);
       setError(null);
+      
+      // Actualizar URL con el nuevo chatId
+      const params = new URLSearchParams(window.location.search);
+      params.set("chat", newChat.idchat.toString());
+      const newURL = `${window.location.pathname}?${params.toString()}`;
+      window.history.replaceState({}, "", newURL);
     } catch (error) {
       console.error('Error creating chat:', error);
       setError('Failed to create chat');
@@ -186,6 +199,12 @@ export function useChat(userId: string) {
   const switchToChat = (chatId: number) => {
     if (chatId !== currentChatId) {
       setCurrentChatId(chatId);
+      
+      // Actualizar URL con el chatId
+      const params = new URLSearchParams(window.location.search);
+      params.set("chat", chatId.toString());
+      const newURL = `${window.location.pathname}?${params.toString()}`;
+      window.history.replaceState({}, "", newURL);
     }
   };
 

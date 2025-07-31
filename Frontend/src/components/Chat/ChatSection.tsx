@@ -24,7 +24,7 @@ export function ChatSection({ messages, onSendEmail, loading, sendingEmail }: Ch
   };
 
   const scrollToBottom = () => {
-    endRef.current?.scrollIntoView({ behavior: 'smooth' });
+    endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
   };
 
   const name = extractNameUser(user?.name || '');
@@ -37,16 +37,16 @@ export function ChatSection({ messages, onSendEmail, loading, sendingEmail }: Ch
 
   if (loading && messages.length === 0) {
     return (
-      <div className="h-full w-full flex flex-col">
+      <>
         <UserMessageSkeleton />
         <AssistantMessageSkeleton />
         <div ref={endRef}/>
-      </div>
+      </>
     );
   }
 
   return (
-     <div className="h-full w-full flex flex-col">
+     <div className="w-full flex flex-col pb-4">
       {messages.length > 0 ? (
         messages.map((msg, index) =>
           msg.role === 'user' ? (
