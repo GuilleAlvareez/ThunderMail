@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { ChatService } from "../services/ChatService";
 import type { Message, EmailData } from "../types/interfaces";
+import { toast } from "react-toastify";
 
 export function useChat(userId: string) {
   const [chats, setChats] = useState<any[]>([]);
@@ -9,6 +10,7 @@ export function useChat(userId: string) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [sendingEmail, setSendingEmail] = useState(false);
 
   // Filtrar chats basado en la búsqueda
   const filteredChats = useMemo(() => {
@@ -134,6 +136,7 @@ export function useChat(userId: string) {
   const handleSendEmail = async (draftContent: string, userEmail: string) => {
     if (!userId || !currentChatId || !draftContent) return;
 
+    setSendingEmail(true);
     try {
       const lines = draftContent.split('\n');
       const to = lines.find(l => l.startsWith('To:'))?.replace('To:', '').trim() || '';
@@ -145,11 +148,13 @@ export function useChat(userId: string) {
 
       const emailData: EmailData = { from: userEmail, to, subject, content, chatId: currentChatId, userId };
       await ChatService.sendEmail(emailData);
-      alert('¡Correo enviado y registrado con éxito!');
+      toast.success('Email sent successfully!');
       
     } catch (error) {
       console.error('Error sending email:', error);
-      alert('Error al enviar el correo.');
+      toast.error('Failed to send email');
+    } finally {
+      setSendingEmail(false);
     }
   };
 
@@ -238,5 +243,6 @@ export function useChat(userId: string) {
     createNewChat,
     switchToChat,
     deleteChat,
+    sendingEmail,
   };
 }

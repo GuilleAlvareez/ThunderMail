@@ -11,9 +11,10 @@ interface ChatSectionProps {
   messages: Message[];
   onSendEmail: (draftContent: string) => void;
   loading: boolean;
+  sendingEmail: boolean;
 }
 
-export function ChatSection({ messages, onSendEmail, loading }: ChatSectionProps) {
+export function ChatSection({ messages, onSendEmail, loading, sendingEmail }: ChatSectionProps) {
   const { user }: { user: User | null; loading: boolean } = useAuth();
   const endRef = useRef<HTMLDivElement>(null);
 
@@ -29,8 +30,10 @@ export function ChatSection({ messages, onSendEmail, loading }: ChatSectionProps
   const name = extractNameUser(user?.name || '');
 
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+    // Usamos un pequeño timeout para asegurar que el DOM se haya actualizado
+    // antes de intentar hacer scroll.
+    setTimeout(scrollToBottom, 100);
+  }, [messages, loading]); 
 
   if (loading && messages.length === 0) {
     return (
@@ -47,29 +50,32 @@ export function ChatSection({ messages, onSendEmail, loading }: ChatSectionProps
       {messages.length > 0 ? (
         messages.map((msg, index) =>
           msg.role === 'user' ? (
-            <div key={index}>
-              <UserMessage message={msg.content} />
-              <div ref={endRef}/>
-            </div>
+            <UserMessage key={index} message={msg.content} />
           ) : (
-            <div key={index}>
-              <AssistantMessage
-                message={msg.content}
-                onSendEmail={onSendEmail}
-              />
-              <div />
-            </div>
+            <AssistantMessage
+              key={index}
+              message={msg.content}
+              onSendEmail={onSendEmail}
+              sendingEmail={sendingEmail}
+            />
           )
         )
       ) : (
         <TextNoMessages name={name} />
       )}
+      
       {loading && (
-        <>
-          <AssistantMessageSkeleton />
-          <div ref={endRef}/>
-        </>
+        <div className="flex justify-start items-center gap-3 mb-4">
+          <img
+            src="/destello.png"
+            alt="Assistant Logo"
+            className="w-8 h-8 rounded-full mt-1"
+          />
+          <p className="text-gray-500">Generating response...</p>
+        </div>
       )}
+
+      <div ref={endRef} />
     </div>
   );
 }

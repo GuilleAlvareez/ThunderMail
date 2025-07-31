@@ -22,8 +22,8 @@ export function Header({ onStyleChange }: HeaderProps) {
 
   function handleStyleChange(value: string) {
     // Crear los parámetros de la URL
-    const params = new URLSearchParams();
-    params.append("style", value);
+    const params = new URLSearchParams(window.location.search);
+    params.set("style", value); // Usar set en lugar de append para evitar duplicados
 
     // Actualizar la URL sin recargar la página
     const newURL = `${window.location.pathname}?${params.toString()}`;

@@ -12,7 +12,7 @@ export function HistoryCard({ id, isActive, onClick }: HistoryCardProps) {
 
   return (
     <button 
-      className={`bg-transparent w-full flex items-center justify-start border border-border rounded-md py-2 pl-3 pr-4 mb-2 shadow transition-all duration-100 ease-in-out hover:bg-hoverSidebar active:scale-95 ${
+      className={`group bg-transparent w-full flex items-center justify-start border border-border rounded-md py-2 pl-3 pr-4 mb-2 shadow transition-all duration-100 ease-in-out hover:bg-hoverSidebar active:scale-95 ${
         isActive ? 'border-gradientText bg-hoverSidebar' : 'border-border'
       }`}
       onClick={onClick}
@@ -21,11 +21,8 @@ export function HistoryCard({ id, isActive, onClick }: HistoryCardProps) {
       <div className="flex justify-between items-center w-full">
       <span>Chat {id}</span>
 
-      {
-        isActive && (
-          <Trash2 onClick={handleDeleteChat} className="w-5 h-5 stroke-1 hover:text-red-700" />
-        )
-      }
+      <Trash2 onClick={handleDeleteChat} className="invisible group-hover:visible w-5 h-5 stroke-1 hover:text-red-700" />
+        
       </div>
     </button>
   );

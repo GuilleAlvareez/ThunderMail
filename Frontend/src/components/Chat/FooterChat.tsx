@@ -1,10 +1,12 @@
 import { ArrowUp } from "lucide-react";
 import { useRef } from 'react';
 
-export function FooterChat({ sendChatMessage, userId }: { sendChatMessage: (prompt: string) => void, userId: string }) {
+export function FooterChat({ sendChatMessage, userId, isDisabled }: { sendChatMessage: (prompt: string) => void, userId: string, isDisabled?: boolean }) {
   const refInput = useRef<HTMLInputElement>(null)
 
   function handleSend() {
+    if (isDisabled) return;
+    
     const prompt = refInput.current?.value || '';
 
     if (prompt.trim()) {
@@ -20,15 +22,20 @@ export function FooterChat({ sendChatMessage, userId }: { sendChatMessage: (prom
           ref={refInput}
           type="text"
           placeholder="Type a message..."
-          className="w-full bg-input rounded-full pl-6 pr-16 py-3 outline-none"
+          className="w-full bg-input rounded-full pl-6 pr-16 py-3 outline-none disabled:opacity-50 disabled:cursor-not-allowed"
           onKeyDown={(e) => {
-            if (e.key === 'Enter') {
+            if (e.key === 'Enter' && !isDisabled) {
               handleSend();
             }
           }}
+          disabled={isDisabled}
         />
         
-        <button onClick={handleSend} className="absolute right-3 top-1/2 -translate-y-1/2 bg-black rounded-full p-1 text-white hover:bg-gray-800 transition">
+        <button 
+          onClick={handleSend} 
+          className="absolute right-3 top-1/2 -translate-y-1/2 bg-black rounded-full p-1 text-white hover:bg-gray-800 transition disabled:bg-gray-500 disabled:cursor-not-allowed"
+          disabled={isDisabled}
+        >
           <ArrowUp className="w-6 h-6 stroke-2" />
         </button>
       </div>

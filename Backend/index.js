@@ -52,7 +52,7 @@ app.post('/chat/createText', async (req, res) => {
   if (!prompt || !userId || !chatId) {
     return res.status(400).json({ error: 'Missing prompt, userId or chatId' });
   }
-  console.log(style)
+  
   try {
     // Obtener mensajes anteriores del chat para contexto
     const previousMessages = await pool.query(`

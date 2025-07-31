@@ -4,9 +4,10 @@ import { separateDraftInfo } from '../../utils/methods';
 interface AssistantMessageProps {
   message: string;
   onSendEmail?: (draftContent: string) => void;
+  sendingEmail?: boolean;
 }
 
-export function AssistantMessage({ message, onSendEmail }: AssistantMessageProps) {
+export function AssistantMessage({ message, onSendEmail, sendingEmail = false }: AssistantMessageProps) {
   const isDraft = message.includes('To:') && message.includes('Subject:') && message.includes('Content:');
   const [to, setTo] = useState('');
   const [subject, setSubject] = useState('');
@@ -109,15 +110,18 @@ export function AssistantMessage({ message, onSendEmail }: AssistantMessageProps
                       const updatedMessage = `To: ${to}\nSubject: ${subject}\nContent:\n${content}`;
                       onSendEmail(updatedMessage);
                     }}
-                    className="group relative inline-flex items-center gap-2 px-4 py-2 bg-thunder-purple text-white font-medium text-sm rounded-xl shadow-md hover:bg-thunder-purple-dark hover:-translate-y-0.5 hover:shadow-xl transition-all duration-300 ease-out overflow-hidden">
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-500" />
+                    disabled={sendingEmail}
+                    className="group relative inline-flex items-center gap-2 px-4 py-2 bg-thunder-purple text-white font-medium text-sm rounded-xl shadow-md hover:bg-thunder-purple-dark hover:-translate-y-0.5 hover:shadow-xl transition-all duration-300 ease-out overflow-hidden disabled:bg-gray-400 disabled:cursor-not-allowed disabled:hover:translate-y-0">
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-500" />
 
-                      <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-                      </svg>
+                    <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                      <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                    </svg>
 
-                      <span className="relative z-10">Enviar Correo</span>
-                    </button>
+                    <span className="relative z-10">
+                      {sendingEmail ? 'Enviando...' : 'Enviar Correo'}
+                    </span>
+                  </button>
                 </>
               )}
             </div>
