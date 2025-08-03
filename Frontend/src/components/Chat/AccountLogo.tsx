@@ -28,7 +28,7 @@ export function AccountLogo({ user, logoutFunction }: AccountLogoProps) {
     <div onClick={showLogoutFunction} ref={refDiv} className="relative flex items-center justify-center cursor-pointer">
       <section className='flex flex-col text-end'>
         <span>{user.name}</span>
-        <span className='text-sm text-textColor'>{user.email}</span>
+        <span className='text-sm text-textColor hidden sm:block'>{user.email}</span>
       </section>
 
       <img

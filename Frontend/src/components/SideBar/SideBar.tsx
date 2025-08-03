@@ -22,7 +22,7 @@ export function SideBar() {
   };
 
   return (
-    <div className="h-full w-1/6 flex flex-col px-4 pt-5 bg-blue-00">
+    <div className="h-full w-full flex flex-col px-4 pt-5 bg-blue-00">
       <div className="h-8 flex items-center ml-1.5 mb-4">
         <img src="./ThunderMailLogo.png" alt="Logo" className="h-7 mr-2" />
         <h1 className="font-bold text-xl">ThunderMail.ai</h1>

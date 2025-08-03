@@ -16,8 +16,8 @@ export function FooterChat({ sendChatMessage, userId, isDisabled }: { sendChatMe
   }
 
   return (
-    <div className="flex justify-center items-center pt-4 px-6">
-      <div className="relative w-2/3">
+    <div className="flex justify-center items-center pt-4 px-2 lg:px-6">
+      <div className="relative w-full lg:w-2/3">
         <input
           ref={refInput}
           type="text"
@@ -30,9 +30,9 @@ export function FooterChat({ sendChatMessage, userId, isDisabled }: { sendChatMe
           }}
           disabled={isDisabled}
         />
-        
-        <button 
-          onClick={handleSend} 
+
+        <button
+          onClick={handleSend}
           className="absolute right-3 top-1/2 -translate-y-1/2 bg-black rounded-full p-1 text-white hover:bg-gray-800 transition disabled:bg-gray-500 disabled:cursor-not-allowed"
           disabled={isDisabled}
         >
