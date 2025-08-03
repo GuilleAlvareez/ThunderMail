@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Menu, Settings } from 'lucide-react';
+import { Menu, WandSparkles } from 'lucide-react';
 import { SideBar } from './components/SideBar/SideBar';
 import { Header } from './components/Chat/Header';
 import { ChatSection } from './components/Chat/ChatSection';
@@ -82,8 +82,8 @@ function App() {
               </button>
               <div className="relative">
                 <Select value={emailStyle} onValueChange={handleStyleChange}>
-                  <SelectTrigger className="w-8 h-8 p-0 border-none bg-transparent hover:bg-gray-100 rounded-md">
-                    <Settings className="w-6 h-6" />
+                  <SelectTrigger className="bg-transparent hover:bg-gray-100 rounded-md">
+                    <WandSparkles className="w-10 h-10" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="formal">Formal</SelectItem>
