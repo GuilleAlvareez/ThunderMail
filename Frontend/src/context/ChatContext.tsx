@@ -37,6 +37,7 @@ export function useChatContext() {
       chats: [],
       messages: [],
       loading: false,
+      chatsLoading: false, // Agregar chatsLoading al fallback
       error: null,
       currentChatId: null,
       searchQuery: "",
@@ -46,6 +47,7 @@ export function useChatContext() {
       createNewChat: async () => {},
       switchToChat: () => {},
       deleteChat: async () => {},
+      sendingEmail: false,
     };
   }
   return context;

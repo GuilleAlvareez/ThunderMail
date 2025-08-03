@@ -46,7 +46,7 @@ export function ChatSection({ messages, onSendEmail, loading, sendingEmail }: Ch
   }
 
   return (
-     <div className="w-full flex flex-col pb-4">
+     <div className="min-w-full min-h-full flex flex-col pb-4">
       {messages.length > 0 ? (
         messages.map((msg, index) =>
           msg.role === 'user' ? (

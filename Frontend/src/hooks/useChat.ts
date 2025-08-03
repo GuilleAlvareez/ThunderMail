@@ -8,6 +8,7 @@ export function useChat(userId: string) {
   const [currentChatId, setCurrentChatId] = useState<number | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
+  const [chatsLoading, setChatsLoading] = useState(false); // Nuevo estado para cargar chats
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [sendingEmail, setSendingEmail] = useState(false);
@@ -24,7 +25,7 @@ export function useChat(userId: string) {
       const chatIdMatch = chat.idchat.toString().toLowerCase().includes(query);
       
       // Filtrar por nombre del chat (si existe)
-      const chatNameMatch = chat.name?.toLowerCase().includes(query) || false;
+      const chatNameMatch = chat.title?.toLowerCase().includes(query) || false;
       
       // Filtrar por "Chat X" donde X es el ID
       const chatLabelMatch = `chat ${chat.idchat}`.toLowerCase().includes(query);
@@ -73,7 +74,7 @@ export function useChat(userId: string) {
     if (!userId) return;
     
     try {
-      setLoading(true);
+      setChatsLoading(true); // Usar chatsLoading en lugar de loading
       const userChats = await ChatService.getChats(userId);
       setChats(userChats);
       
@@ -95,26 +96,73 @@ export function useChat(userId: string) {
       console.error('Error loading chats:', error);
       setError('Failed to load chats');
     } finally {
-      setLoading(false);
+      setChatsLoading(false); // Usar chatsLoading
     }
+  };
+
+  // Función para generar título basado en la dirección de correo del borrador
+  const generateChatTitle = (aiResponse: string): string => {
+    // Buscar la línea que contiene "To:"
+    const lines = aiResponse.split('\n');
+    const toLine = lines.find(line => line.trim().startsWith('To:'));
+    
+    if (toLine) {
+      // Extraer el email después de "To:"
+      const email = toLine.replace('To:', '').trim();
+      return email;
+    }
+    
+    // Fallback: usar las primeras palabras si no es un email
+    const words = aiResponse.trim().split(' ').slice(0, 5);
+    let title = words.join(' ');
+    
+    if (title.length > 30) {
+      title = title.substring(0, 27) + '...';
+    }
+    
+    return title;
   };
 
   // Enviar mensaje del usuario y generar respuesta del asistente
   const sendChatMessage = async (prompt: string, messageStyle: string) => {
-    if (!prompt.trim() || !userId || !currentChatId) return;
+    if (!prompt.trim() || !userId) return;
+
+    // Si no hay currentChatId, crear un chat primero
+    let chatId = currentChatId;
+    if (!chatId) {
+      try {
+        const newChat = await ChatService.createNewChat(userId);
+        setChats(prev => [newChat, ...prev]);
+        setCurrentChatId(newChat.idchat);
+        chatId = newChat.idchat;
+        
+        // Actualizar URL con el nuevo chatId
+        const params = new URLSearchParams(window.location.search);
+        params.set("chat", newChat.idchat.toString());
+        const newURL = `${window.location.pathname}?${params.toString()}`;
+        window.history.replaceState({}, "", newURL);
+      } catch (error) {
+        console.error('Error creating chat:', error);
+        setError('Failed to create chat');
+        return;
+      }
+    }
 
     setLoading(true);
 
     try {
+      // Verificar si es el primer mensaje del chat
+      const isFirstMessage = messages.length === 0;
+
       // 1. Crear y guardar el mensaje del usuario en la BD primero
-      const userMessage = { content: prompt, chatId: currentChatId, userId: userId, role: "user" as const };
+      const userMessage = { content: prompt, chatId: chatId, userId: userId, role: "user" as const };
       const savedUserMessage = await ChatService.saveChatMessage(userMessage);
 
-      // 2. Actualizar el estado con el mensaje del usuario guardado (con ID correcto)
+      // 2. Actualizar el estado con el mensaje del usuario guardado
       setMessages(prev => [...prev, savedUserMessage]);
 
-      // 3. Generar la respuesta del asistente
-      const draft = await ChatService.generateDraft(prompt, userId, currentChatId, messageStyle);
+      // 4. Generar la respuesta del asistente
+      const draft = await ChatService.generateDraft(prompt, userId, chatId, messageStyle);
 
       let assistantContent;
       if (typeof draft === 'object' && draft.to && draft.subject && draft.content !== undefined) {
@@ -123,17 +171,34 @@ export function useChat(userId: string) {
         assistantContent = typeof draft === 'string' ? draft : JSON.stringify(draft);
       }
 
-      // 4. Crear y guardar el mensaje del asistente en la BD
-      const assistantMessage = { content: assistantContent, chatId: currentChatId, userId: userId, role: "assistant" as const };
+      // 3. Si es el primer mensaje, generar y actualizar el título del chat usando la respuesta de la IA
+      if (isFirstMessage) {
+        try {
+          const title = generateChatTitle(assistantContent);
+          await ChatService.updateChatTitle(chatId, title);
+          
+          // Actualizar el chat en el estado local
+          setChats(prev => prev.map(chat => 
+            chat.idchat === chatId 
+              ? { ...chat, title } 
+              : chat
+          ));
+        } catch (error) {
+          console.error('Error updating chat title:', error);
+          // No interrumpir el flujo si falla la actualización del título
+        }
+      }
+
+      // 5. Crear y guardar el mensaje del asistente en la BD
+      const assistantMessage = { content: assistantContent, chatId: chatId, userId: userId, role: "assistant" as const };
       const savedAssistantMessage = await ChatService.saveChatMessage(assistantMessage);
 
-      // 5. Actualizar el estado agregando el mensaje del asistente guardado
+      // 6. Actualizar el estado agregando el mensaje del asistente guardado
       setMessages(prev => [...prev, savedAssistantMessage]);
 
     } catch (error) {
       console.error('Error sending message:', error);
       setError('Failed to send message');
-      // En caso de error, no necesitamos remover nada porque no hicimos actualización optimista
     } finally {
       setLoading(false);
     }
@@ -253,6 +318,7 @@ export function useChat(userId: string) {
     chats: filteredChats,
     messages,
     loading,
+    chatsLoading, // Exportar el nuevo estado
     error,
     currentChatId,
     searchQuery,

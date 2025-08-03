@@ -1,16 +1,18 @@
-import { InputSearch } from './InputSearch';
-import { SectionCard } from './SectionCard';
-import { HistoryCard } from './HistoryCard';
-import { ChatHistorySkeleton } from '../Loaders/ChatHistorySkeleton';
-import { Separator } from './Separator';
-import { useChatContext } from '../../context/ChatContext';
-import { MessageSquarePlus, Archive, Trash2 } from 'lucide-react';
+import { InputSearch } from "./InputSearch";
+import { SectionCard } from "./SectionCard";
+import { HistoryCard } from "./HistoryCard";
+import { ChatHistorySkeleton } from "../Loaders/ChatHistorySkeleton";
+import { Separator } from "./Separator";
+import { useChatContext } from "../../context/ChatContext";
+import { MessageSquarePlus, Archive, Trash2 } from "lucide-react";
+import { ToastContainer } from "react-toastify";
 
 export function SideBar() {
-  const { chats, createNewChat, switchToChat, currentChatId, loading } = useChatContext();
+  const { chats, createNewChat, switchToChat, currentChatId, chatsLoading } =
+    useChatContext(); // Usar chatsLoading
 
   const sections = [
-    { text: 'New Chat', icon: MessageSquarePlus, onClick: createNewChat },
+    { text: "New Chat", icon: MessageSquarePlus, onClick: createNewChat },
     // { text: 'Archive', icon: Archive, onClick: () => console.log('Archive clicked') },
     // { text: 'Trash', icon: Trash2, onClick: () => console.log('Trash clicked') },
   ];
@@ -21,18 +23,18 @@ export function SideBar() {
 
   return (
     <div className="h-full w-1/6 flex flex-col px-4 pt-5 bg-blue-00">
-      <div className='h-8 flex items-center ml-1.5 mb-4'>
+      <div className="h-8 flex items-center ml-1.5 mb-4">
         <img src="./ThunderMailLogo.png" alt="Logo" className="h-7 mr-2" />
-        <h1 className='font-bold text-xl'>ThunderMail.ai</h1>
+        <h1 className="font-bold text-xl">ThunderMail.ai</h1>
       </div>
 
-      <section className='flex flex-col flex-grow pl-1 pr-1 w-full overflow-hidden'>
+      <section className="flex flex-col flex-grow pl-1 pr-1 w-full overflow-hidden">
         <InputSearch />
 
         {sections.map(({ text, icon: Icon, onClick }, index) => (
-          <SectionCard 
-            text={text} 
-            icon={<Icon className='w-6 h-6 text-black mr-2 stroke-1' />} 
+          <SectionCard
+            text={text}
+            icon={<Icon className="w-6 h-6 text-black mr-2 stroke-1" />}
             key={index}
             onClick={onClick}
           />
@@ -40,15 +42,16 @@ export function SideBar() {
 
         <Separator />
 
-        <h2 className='text-textBar my-2'>RECENT CHATS</h2>
+        <h2 className="text-textBar my-2">RECENT CHATS</h2>
 
-        {loading ? (
+        {chatsLoading ? ( // Usar chatsLoading en lugar de loading
           <ChatHistorySkeleton />
         ) : (
-          <div className='flex-1 overflow-y-auto pr-1'>
+          <div className="flex-1 overflow-y-auto pr-1">
             {chats.map((chat) => (
-              <HistoryCard 
-                id={chat.idchat} 
+              <HistoryCard
+                id={chat.idchat}
+                title={chat.title}
                 key={chat.idchat}
                 isActive={chat.idchat === currentChatId}
                 onClick={() => handleSwitchChat(chat.idchat)}
@@ -57,6 +60,20 @@ export function SideBar() {
           </div>
         )}
       </section>
+
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        aria-label={undefined}
+      />
     </div>
   );
 }

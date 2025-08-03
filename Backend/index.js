@@ -251,6 +251,31 @@ app.post('/chat/newMessage', async (req, res) => {
   }
 });
 
+// Endpoint para actualizar el título de un chat
+app.put('/chat/:chatId/title', async (req, res) => {
+  const { chatId } = req.params;
+  const { title } = req.body;
+
+  if (!chatId || !title) {
+    return res.status(400).json({ error: 'Missing chatId or title' });
+  }
+
+  try {
+    const result = await pool.query(`
+      UPDATE chat SET title = $1 WHERE idchat = $2 RETURNING *
+    `, [title, chatId]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Chat not found' });
+    }
+
+    res.status(200).json(result.rows[0]);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: 'Failed to update chat title' });
+  }
+});
+
 app.listen(3000, () => {
   console.log('Server started on port 3000');
 });

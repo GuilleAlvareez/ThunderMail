@@ -36,7 +36,7 @@ export function AssistantMessage({ message, onSendEmail, sendingEmail = false }:
         {isDraft && onSendEmail ? (
           <div className="bg-[#FBFBFB] rounded-xl max-w-xl px-4 py-3 border border-border shadow-md">
              <p className="text-sm text-gray-600">
-              <span className="font-semibold">To:</span> {to}
+              {to}
             </p>
             <h2 className="text-lg font-bold text-gray-800 mt-1 mb-1">
               {subject}

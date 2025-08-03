@@ -72,5 +72,17 @@ export const ChatService = {
 
     if (!response.ok) throw new Error('Failed to delete chat');
     return await response.json();
+  },
+
+  // Actualizar título del chat
+  updateChatTitle: async (chatId: number, title: string) => {
+    const response = await fetch(`http://localhost:3000/chat/${chatId}/title`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title })
+    });
+
+    if (!response.ok) throw new Error('Failed to update chat title');
+    return await response.json();
   }
 };
