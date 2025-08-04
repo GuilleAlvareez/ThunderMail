@@ -1,11 +1,38 @@
 import { useEffect, useState } from 'react';
-import { separateDraftInfo } from '../../utils/methods';
+import type { AssistantMessageProps } from '../../types/interfaces';
 
-interface AssistantMessageProps {
-  message: string;
-  onSendEmail?: (draftContent: string) => void;
-  sendingEmail?: boolean;
+// Función para separar la información del draft
+function separateDraftInfo(draft: string) {
+  const lines = draft.split(/\r?\n/);
+
+  let to = '';
+  let subject = '';
+  let content = '';
+
+  for (const line of lines) {
+    if (line.startsWith('To:')) {
+      to = line.replace('To:', '').trim();
+    } else if (line.startsWith('Subject:')) {
+      subject = line.replace('Subject:', '').trim();
+    }
+  }
+
+  // Encontrar el índice de la línea "Content:"
+  const contentIndex = lines.findIndex(line => line.startsWith('Content:'));
+
+  // Si existe "Content:", unir todas las líneas después como el contenido
+  if (contentIndex !== -1) {
+    content = lines.slice(contentIndex + 1).join('\n').trim();
+  }
+
+  return {
+    to: to,
+    subject: subject,
+    content: content,
+  };
 }
+
+
 
 export function AssistantMessage({ message, onSendEmail, sendingEmail = false }: AssistantMessageProps) {
   const isDraft = message.includes('To:') && message.includes('Subject:') && message.includes('Content:');

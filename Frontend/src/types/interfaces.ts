@@ -3,7 +3,7 @@ export interface User {
   name: string;
   email: string;
   emailVerified: boolean;
-  image: string;
+  image?: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -19,8 +19,9 @@ export type LoginButtonProps = {
 
 export interface HistoryCardProps {
   id: number;
-  isActive?: boolean;
-  onClick?: () => void;
+  title?: string;
+  isActive: boolean;
+  onClick: () => void;
 }
 
 export interface SectionCardProps {
@@ -45,3 +46,58 @@ export interface EmailData {
   chatId: number;
   userId: string;
 }
+
+// Props para componentes de Chat
+export interface AssistantMessageProps {
+  message: string;
+  onSendEmail?: (draftContent: string) => void;
+  sendingEmail?: boolean;
+}
+
+export interface UserMessageProps {
+  message: string;
+}
+
+/**
+ * Props para el componente ChatSection que gestiona la sección principal de chat.
+ * @property {Message[]} messages - Array de mensajes que se mostrarán en el chat
+ * @property {(draftContent: string) => void} onSendEmail - Función para manejar el envío de emails
+ * @property {boolean} loading - Indica si se está cargando un nuevo mensaje
+ * @property {boolean} sendingEmail - Indica si se está procesando el envío de un email
+ */
+export interface ChatSectionProps {
+  messages: Message[];
+  onSendEmail: (draftContent: string) => void;
+  loading: boolean;
+  sendingEmail: boolean;
+}
+
+/**
+ * Props para el componente FooterChat que contiene el área de entrada de mensajes.
+ * @property {(prompt: string) => void} sendChatMessage - Función para enviar nuevos mensajes
+ * @property {boolean} [isDisabled] - Indica si la entrada de mensajes está deshabilitada
+ */
+export interface FooterChatProps {
+  sendChatMessage: (prompt: string) => void;
+  isDisabled?: boolean;
+}
+
+/**
+ * Props para el componente TextNoMessages que se muestra cuando no hay mensajes.
+ * @property {string} name - Nombre del usuario para personalizar el mensaje
+ */
+export interface TextNoMessagesProps {
+  name: string;
+}
+
+/**
+ * Props para el componente AuthModal que maneja la autenticación.
+ * @property {boolean} isOpen - Controla la visibilidad del modal
+ * @property {() => void} onClose - Función para cerrar el modal
+ */
+export interface AuthModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+

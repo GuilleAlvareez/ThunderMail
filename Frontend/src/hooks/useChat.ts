@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import { ChatService } from "../services/ChatService";
 import type { Message, EmailData } from "../types/interfaces";
 import { toast } from "react-toastify";
+import { updateUrlParam, getUrlParam } from "../utils/urlParams";
 
 export function useChat(userId: string) {
   const [chats, setChats] = useState<any[]>([]);
@@ -79,10 +80,9 @@ export function useChat(userId: string) {
       setChats(userChats);
       
       // Obtener chatId de la URL
-      const params = new URLSearchParams(window.location.search);
-      const chatIdFromUrl = params.get("chat");
+      const chatIdFromUrl = getUrlParam("chat");
       
-      if (chatIdFromUrl && userChats.some(chat => chat.idchat === parseInt(chatIdFromUrl))) {
+      if (chatIdFromUrl && userChats.some((chat: any) => chat.idchat === parseInt(chatIdFromUrl))) {
         // Si hay un chat válido en la URL, seleccionarlo
         setCurrentChatId(parseInt(chatIdFromUrl));
       } else if (userChats.length > 0 && !currentChatId) {
@@ -137,10 +137,7 @@ export function useChat(userId: string) {
         chatId = newChat.idchat;
         
         // Actualizar URL con el nuevo chatId
-        const params = new URLSearchParams(window.location.search);
-        params.set("chat", newChat.idchat.toString());
-        const newURL = `${window.location.pathname}?${params.toString()}`;
-        window.history.replaceState({}, "", newURL);
+        updateUrlParam("chat", newChat.idchat.toString());
       } catch (error) {
         console.error('Error creating chat:', error);
         setError('Failed to create chat');
@@ -151,6 +148,12 @@ export function useChat(userId: string) {
     setLoading(true);
 
     try {
+      // Verificar que tenemos un chatId válido
+      if (!chatId) {
+        console.error("No chatId available");
+        return;
+      }
+
       // Verificar si es el primer mensaje del chat
       const isFirstMessage = messages.length === 0;
 
@@ -245,10 +248,7 @@ export function useChat(userId: string) {
       setError(null);
       
       // Actualizar URL con el nuevo chatId
-      const params = new URLSearchParams(window.location.search);
-      params.set("chat", newChat.idchat.toString());
-      const newURL = `${window.location.pathname}?${params.toString()}`;
-      window.history.replaceState({}, "", newURL);
+      updateUrlParam("chat", newChat.idchat.toString());
     } catch (error) {
       console.error('Error creating chat:', error);
       setError('Failed to create chat');
@@ -266,10 +266,7 @@ export function useChat(userId: string) {
       setCurrentChatId(chatId);
       
       // Actualizar URL con el chatId
-      const params = new URLSearchParams(window.location.search);
-      params.set("chat", chatId.toString());
-      const newURL = `${window.location.pathname}?${params.toString()}`;
-      window.history.replaceState({}, "", newURL);
+      updateUrlParam("chat", chatId.toString());
     }
   };
 

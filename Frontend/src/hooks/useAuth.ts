@@ -1,17 +1,16 @@
 import { authService } from "../services/AuthServise";
 import { useEffect, useState } from "react";
+import type { User } from "../types/interfaces";
 
 export const useAuth = () => {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<User | null>(null);
 
   const handleLogin = async () => {
     try {
       await authService.login();
     } catch (error) {
       console.log(error);
-      setError(true);
     }
   };
 
@@ -23,7 +22,6 @@ export const useAuth = () => {
       setLoading(false);
     } catch (error) {
       console.log(error);
-      setError(true);
     }
   };
 
@@ -34,7 +32,6 @@ export const useAuth = () => {
       setUser(userSession?.data?.user || null);
     } catch (error) {
       console.error("Error obteniendo info de usuario:", error);
-      setError(true);
     } finally {
       setLoading(false);
     }
@@ -45,5 +42,5 @@ export const useAuth = () => {
     getUserInfo();
   }, []);
 
-  return { user, loading, error, handleLogin, handleLogout };
+  return { user, loading, handleLogin, handleLogout };
 };

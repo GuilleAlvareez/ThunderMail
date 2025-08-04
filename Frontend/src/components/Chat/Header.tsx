@@ -1,22 +1,10 @@
-import { useEffect, useState } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import { AccountLogo } from "./AccountLogo";
 import { LoginButton } from "./LoginButton";
 import { LoadingAccount } from "../Loaders/loadingAccount";
-// import {
-//   Select,
-//   SelectContent,
-//   SelectItem,
-//   SelectTrigger,
-//   SelectValue,
-// } from "@/components/ui/select";
 import type { User } from "../../types/interfaces";
 
-interface HeaderProps {
-  onStyleChange: (style: string) => void;
-}
-
-export function Header({ onStyleChange }: HeaderProps) {
+export function Header() {
   const { user, loading, handleLogin, handleLogout } = useAuth();
   
 

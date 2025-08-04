@@ -1,6 +1,6 @@
 import type { AccountLogoProps } from '../../types/interfaces';
 import { useState, useRef, useEffect } from 'react';
-import { ArrowDown, LogOut } from 'lucide-react';
+import { LogOut } from 'lucide-react';
 
 export function AccountLogo({ user, logoutFunction }: AccountLogoProps) {
   const [showLogout, setShowLogout] = useState(false);
@@ -32,7 +32,7 @@ export function AccountLogo({ user, logoutFunction }: AccountLogoProps) {
       </section>
 
       <img
-        src={user.image}
+        src={user.image || '/destello.png'}
         alt={user.name}
         className="w-10 h-10 rounded-full ml-4"
       />

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useChatContext } from '../../context/ChatContext';
+import { updateUrlParam, getUrlParam } from '../../utils/urlParams';
 
 export function InputSearch() {
   const { searchQuery, updateSearchQuery } = useChatContext();
@@ -9,16 +10,7 @@ export function InputSearch() {
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       updateSearchQuery(localSearchQuery);
-      
-      const params = new URLSearchParams(window.location.search);
-      if (localSearchQuery.trim()) {
-        params.set("search", localSearchQuery);
-      } else {
-        params.delete("search");
-      }
-      
-      const newURL = `${window.location.pathname}?${params.toString()}`;
-      window.history.replaceState({}, "", newURL);
+      updateUrlParam("search", localSearchQuery.trim() || null);
     }, 50);
 
     return () => clearTimeout(timeoutId);
@@ -30,8 +22,7 @@ export function InputSearch() {
   
   useEffect(() => {
     // Get search parameter from URL on mount
-    const params = new URLSearchParams(window.location.search);
-    const searchFromUrl = params.get("search") || "";
+    const searchFromUrl = getUrlParam("search") || "";
     setLocalSearchQuery(searchFromUrl);
     updateSearchQuery(searchFromUrl);
   }, [updateSearchQuery]);

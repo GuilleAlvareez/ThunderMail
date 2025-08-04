@@ -4,15 +4,10 @@ import { UserMessage } from './UserMessage';
 import { AssistantMessage } from './AssistantMessage';
 import { UserMessageSkeleton, AssistantMessageSkeleton } from '../Loaders/MessageSkeleton';
 import { useEffect, useRef } from 'react';
-import type { User, Message } from '../../types/interfaces';
+import type { User, ChatSectionProps } from '../../types/interfaces';
 import './styles/ChatSection.css';
 
-interface ChatSectionProps {
-  messages: Message[];
-  onSendEmail: (draftContent: string) => void;
-  loading: boolean;
-  sendingEmail: boolean;
-}
+
 
 export function ChatSection({ messages, onSendEmail, loading, sendingEmail }: ChatSectionProps) {
   const { user }: { user: User | null; loading: boolean } = useAuth();

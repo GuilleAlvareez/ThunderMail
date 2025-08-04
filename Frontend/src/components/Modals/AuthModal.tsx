@@ -11,11 +11,6 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
   if (!isOpen) return null;
 
-  const handleRegister = () => {
-    handleLogin();
-    onClose();
-  };
-
   const handleLoginClick = () => {
     handleLogin();
     onClose();

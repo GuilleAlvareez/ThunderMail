@@ -1,7 +1,7 @@
 import { ArrowUp } from "lucide-react";
 import { useRef } from 'react';
 
-export function FooterChat({ sendChatMessage, userId, isDisabled }: { sendChatMessage: (prompt: string) => void, userId: string, isDisabled?: boolean }) {
+export function FooterChat({ sendChatMessage, isDisabled }: { sendChatMessage: (prompt: string) => void, isDisabled?: boolean }) {
   const refInput = useRef<HTMLInputElement>(null)
 
   function handleSend() {

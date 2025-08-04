@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Menu, WandSparkles } from 'lucide-react';
 import { SideBar } from './components/SideBar/SideBar';
+import { updateUrlParam, getUrlParamWithDefault } from './utils/urlParams';
 import { Header } from './components/Chat/Header';
 import { ChatSection } from './components/Chat/ChatSection';
 import { FooterChat } from './components/Chat/FooterChat';
@@ -14,7 +15,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "./components/ui/select";
 
 function App() {
   const { user } = useAuth();
@@ -37,21 +38,12 @@ function App() {
 
 
   function handleStyleChange(value: string) {
-    // Crear los parámetros de la URL
-    const params = new URLSearchParams(window.location.search);
-    params.set("style", value); // Usar set en lugar de append para evitar duplicados
-
-    // Actualizar la URL sin recargar la página
-    const newURL = `${window.location.pathname}?${params.toString()}`;
-    window.history.replaceState({}, "", newURL);
-
+    updateUrlParam("style", value);
     setEmailStyle(value);
   }
 
   useEffect(() => {
-    // Obtener el parámetro "style" de la URL
-    const params = new URLSearchParams(window.location.search);
-    const style = params.get("style") || "formal";
+    const style = getUrlParamWithDefault("style", "formal");
     setEmailStyle(style);
   }, [])
 
@@ -94,7 +86,7 @@ function App() {
                 </Select>
               </div>
             </div>
-            <Header onStyleChange={handleStyleChange} />
+            <Header />
           </div>
 
           {/* Header original - solo visible en pantallas grandes */}
@@ -113,7 +105,7 @@ function App() {
             </Select>
 
             {/* Información del usuario */}
-            <Header onStyleChange={handleStyleChange} />
+            <Header />
           </div>
 
           <div className="overflow-y-auto min-h-0 flex-1 px-2 lg:px-0">
@@ -128,7 +120,6 @@ function App() {
           <div className="px-2 lg:px-0">
             <FooterChat
               sendChatMessage={handleSendMessage}
-              userId={user?.id || ''}
               isDisabled={sendingEmail}
             />
           </div>

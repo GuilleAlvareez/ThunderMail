@@ -1,4 +1,4 @@
-import type { Message, EmailData } from '../types/interfaces';
+import type { EmailData } from '../types/interfaces';
 
 export const ChatService = {
   // Obtener chats del usuario

@@ -4,7 +4,7 @@ import { HistoryCard } from "./HistoryCard";
 import { ChatHistorySkeleton } from "../Loaders/ChatHistorySkeleton";
 import { Separator } from "./Separator";
 import { useChatContext } from "../../context/ChatContext";
-import { MessageSquarePlus, Archive, Trash2 } from "lucide-react";
+import { MessageSquarePlus } from "lucide-react";
 import { ToastContainer } from "react-toastify";
 
 export function SideBar() {

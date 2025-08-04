@@ -1,4 +1,6 @@
-export function UserMessage({ message }: { message: string }) {
+import type { UserMessageProps } from '../../types/interfaces';
+
+export function UserMessage({ message }: UserMessageProps) {
   return (
     <div className="flex items-center justify-end gap-3 mb-4 mr-1">
       <div className="bg-[#E9E6F5] p-3 mt-3 rounded-xl max-w-xl tansition-all duration-200 ease-in-out shadow-bubbleShadow ">
