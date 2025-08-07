@@ -20,5 +20,5 @@ export const auth = betterAuth({
       sameSite: "none",
     },
   },
-  trustedOrigins: ["http://localhost:5173"],
+  trustedOrigins: ["http://localhost:5173", "https://thunder-mail.vercel.app"],
 });
