@@ -1,7 +1,7 @@
 import type { EmailData } from '../types/interfaces';
 
 // Obtiene la URL base de la API desde las variables de entorno.
-const API_BASE_URL = import.meta.env.URL_BACKEND;
+const API_BASE_URL = import.meta.env.VITE_URL_BACKEND;
 
 export const ChatService = {
   // Obtener chats del usuario
