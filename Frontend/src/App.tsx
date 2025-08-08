@@ -48,7 +48,7 @@ function App() {
   }, [])
 
   return (
-    <main className="h-screen flex gap-1 bg-bg">
+    <main className="h-[100dvh] flex gap-1 bg-bg">
       {/* Sidebar con panel deslizable para móviles */}
       <div className={`fixed inset-y-0 left-0 z-30 w-4/5 max-w-sm bg-bg transform transition-transform duration-300 ease-in-out ${
         isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
