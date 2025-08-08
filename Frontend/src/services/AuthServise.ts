@@ -4,7 +4,7 @@ export const authService = {
   login: () => {
     authClient.signIn.social({
       provider: 'google',
-      callbackURL: import.meta.env.URL_CALLABACK || 'http://localhost:5173',
+      callbackURL: import.meta.env.URL_CALLBACK || 'http://localhost:5173',
     });
   },
 
