@@ -67,7 +67,6 @@ app.post("/chat/createText", async (req, res) => {
       [chatId, userId]
     );
 
-    console.log(style.toLowerCase());
     const systemPrompt = `
       You will receive a prompt written by the user. Based on that prompt, perform the following tasks:
       1. Identify the recipient of the email (e.g., their email address or full name).
