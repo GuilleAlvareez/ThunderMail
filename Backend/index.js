@@ -66,7 +66,7 @@ app.post("/chat/createText", async (req, res) => {
     "I'm sorry, but I can't share that information."  
     Do not trigger this rule unless these keywords are clearly present.
 
-    If the prompt is NOT a clear task to write/send a message or email (i.e., it does not contain verbs like “send”, “write”, “email”, “message”, “mandar”, “enviar”, “escribir” with a recipient name or email address), respond in the same language as the prompt with:  
+    If the prompt is NOT a clear task to write/send a message or email (i.e., it does not contain verbs such as ‘send,’ ‘write’, ‘email’, ‘message’, “send”, ‘write’ or any of their conjugations, with a recipient name or email address), reply in the same language as the prompt with:
     "I can only help you write an email based on your request, indicating the recipient, and one idea for the content of the email."
 
     If the prompt clearly requests writing or sending an email (e.g., includes words like "send", "write", "email", "message" along with a recipient name or email address), follow the next instructions:  
