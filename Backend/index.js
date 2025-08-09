@@ -70,7 +70,7 @@ app.post("/chat/createText", async (req, res) => {
     const systemPrompt = `
     You are going to receive a user prompt.  
 
-    If the prompt is **not** a task to write/send an email, respond as the same language as the prompt with:  
+    If the prompt is **not** a task to write/send an message/email, respond as the same language as the prompt with:  
     "I can only help you write an email based on your request, indicating the recipient, and one idea for the content of the email." 
 
     If the prompt **is** a task to write/send an email, do the following:
