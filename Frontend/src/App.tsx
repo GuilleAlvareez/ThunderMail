@@ -16,7 +16,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./components/ui/select";
-import { Analytics } from "@vercel/analytics/next"
 
 function App() {
   const { user } = useAuth();
@@ -50,7 +49,6 @@ function App() {
 
   return (
     <main className="h-[100dvh] flex gap-1 bg-bg">
-      <Analytics />
       {/* Sidebar con panel deslizable para móviles */}
       <div className={`fixed inset-y-0 left-0 z-30 w-4/5 max-w-sm bg-bg transform transition-transform duration-300 ease-in-out ${
         isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
