@@ -73,7 +73,7 @@ app.post("/chat/createText", async (req, res) => {
     If the prompt is **not** a task to write/send an message/email, respond as the same language as the prompt with:  
     "I can only help you write an email based on your request, indicating the recipient, and one idea for the content of the email." 
 
-    If the prompt **is** a task to write/send an email, do the following:
+    If the prompt clearly requests writing or sending an email (e.g., includes words like "send", "write", "email", "message" along with a recipient name or email address), follow the next instructions:  
     1. Extract the email recipient (email address or full name).
     2. Create an appropriate subject line based on the content of the prompt.
     3. Write the body of the email following the indicated style (formal, informal, direct, funny), applying these rules:
