@@ -109,6 +109,7 @@ app.post("/chat/createText", async (req, res) => {
       ⚠️ If any required information is missing, break the format and respond with a clear, conversational message asking the user for what’s missing — in the same language as the prompt.
     `;
 
+    console.log(systemPrompt);
     // Construir el array de mensajes con contexto
     const messages = [{ role: "system", content: systemPrompt }];
 
