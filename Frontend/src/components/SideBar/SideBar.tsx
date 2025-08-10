@@ -5,7 +5,6 @@ import { ChatHistorySkeleton } from "../Loaders/ChatHistorySkeleton";
 import { Separator } from "./Separator";
 import { useChatContext } from "../../context/ChatContext";
 import { MessageSquarePlus } from "lucide-react";
-import { ToastContainer } from "react-toastify";
 
 export function SideBar() {
   const { chats, createNewChat, switchToChat, currentChatId, chatsLoading } =
@@ -60,20 +59,6 @@ export function SideBar() {
           </div>
         )}
       </section>
-
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick={false}
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-        aria-label={undefined}
-      />
     </div>
   );
 }

@@ -59,7 +59,7 @@ export function ChatSection({ messages, onSendEmail, loading, sendingEmail }: Ch
         <TextNoMessages name={name} />
       )}
       
-      {/* {loading && (
+      {loading && (
         <div className="flex justify-start items-center gap-3 mb-4">
           <img
             src="/destello.png"
@@ -68,7 +68,7 @@ export function ChatSection({ messages, onSendEmail, loading, sendingEmail }: Ch
           />
           <p className="text-gray-500">Generating response...</p>
         </div>
-      )} */}
+      )}
 
       <div ref={endRef} />
     </div>
