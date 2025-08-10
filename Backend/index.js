@@ -15,7 +15,7 @@ app.use(cors(corsOptions));
 app.all("/api/auth/*", toNodeHandler(auth.handler));
 app.use(express.json());
 
-app.get('/health', (req, res) => {
+app.head('/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
