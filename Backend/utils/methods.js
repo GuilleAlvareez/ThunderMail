@@ -34,7 +34,7 @@ export function separateInfo(text) {
   };
 }
 
-async function generateWithModel(modelName, messages) {
+export async function generateWithModel(modelName, messages) {
   // Verificamos que el nombre del modelo no esté vacío
   if (!modelName) {
     throw new Error("Model name is not defined.");
