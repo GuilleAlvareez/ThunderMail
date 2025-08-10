@@ -15,6 +15,10 @@ app.use(cors(corsOptions));
 app.all("/api/auth/*", toNodeHandler(auth.handler));
 app.use(express.json());
 
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok' });
+});
+
 // Endpoint para enviar email y registrar en emailsended
 app.post("/chat/send-email", async (req, res) => {
   const { from, to, subject, content, chatId, userId } = req.body;
