@@ -2,7 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import { pool } from "./utils/config.js";
-import { separateInfo } from "./utils/methods.js";
+import { separateInfo, generateWithModel } from "./utils/methods.js";
 import { toNodeHandler, fromNodeHeaders } from "better-auth/node";
 import { auth } from "./utils/auth.js";
 import { corsOptions, transporter } from "./utils/constant.js";
@@ -180,43 +180,49 @@ app.post("/chat/createText", async (req, res) => {
       { role: "user", content: prompt }
     ];
 
-    const messageToSend = {
-      model: process.env.LLM_MODEL,
-      messages: messages,
-    };
+     let aiResponse;
 
-    const response = await fetch(
-      "https://openrouter.ai/api/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${process.env.API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(messageToSend),
+    try {
+      // --- INTENTO 1: Modelo Primario ---
+      aiResponse = await generateWithModel(process.env.LLM_MODEL, messages);
+
+    } catch (primaryError) {
+      console.error(`Primary model (${process.env.LLM_MODEL}) failed:`, primaryError.message);
+      
+      // Si el modelo primario falla, intentamos con el secundario.
+      // Verificamos si la variable de entorno para el modelo de respaldo existe.
+      if (!process.env.LLM_MODEL2) {
+        console.error("No fallback model (LLM_MODEL2) configured.");
+        // Si no hay modelo de respaldo, lanzamos el error original para que lo capture el catch final.
+        throw primaryError;
       }
-    );
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      console.log("Attempting fallback to secondary model...");
+      
+      // --- INTENTO 2: Modelo Secundario (Fallback) ---
+      // Este segundo try/catch es por si el modelo de respaldo también falla.
+      try {
+        aiResponse = await generateWithModel(process.env.LLM_MODEL2, messages);
+      } catch (secondaryError) {
+        console.error(`Secondary model (${process.env.LLM_MODEL2}) also failed:`, secondaryError.message);
+        // Si ambos fallan, lanzamos un nuevo error que será capturado por el catch principal.
+        throw new Error("Both primary and fallback models failed to generate a response.");
+      }
     }
 
-    const data = await response.json();
-    const aiResponse = data.choices[0].message.content;
-
-    // Intentar separar la información como email estructurado
+    // Si llegamos aquí, es porque aiResponse tiene una respuesta válida de alguno de los dos modelos.
     const information = separateInfo(aiResponse);
 
-    // Si separateInfo devuelve null, significa que no es un email estructurado
-    // En ese caso, devolver el texto plano directamente
     if (information === null) {
       res.status(200).json(aiResponse);
     } else {
       res.status(200).json(information);
     }
+
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: "Failed to generate text" });
+    // Este es el catch final. Captura cualquier error que no se haya manejado antes.
+    console.error("Final error after all attempts:", error.message);
+    res.status(500).json({ error: "Failed to generate text after multiple attempts." });
   }
 });
 
