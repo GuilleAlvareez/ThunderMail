@@ -15,8 +15,8 @@ app.use(cors(corsOptions));
 app.all("/api/auth/*", toNodeHandler(auth.handler));
 app.use(express.json());
 
-app.head('/health', (req, res) => {
-  res.json({ status: 'ok' });
+app.get('/', (req, res) => {
+  res.status(200).send('ThunderMail API is running!');
 });
 
 // Endpoint para enviar email y registrar en emailsended
