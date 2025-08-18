@@ -30,7 +30,7 @@ app.post("/chat/send-email", async (req, res) => {
   try {
     // Enviar el email
     await transporter.sendMail({
-      from: "guillealvarezmoreno2@gmail.com",
+      from: '',//put your email
       to: to,
       subject: subject,
       text: content,
