@@ -295,6 +295,4 @@ sequenceDiagram
 ```
 
 ---
-
 *Desarrollado con ❤️ por [GuilleAlvareez](https://github.com/GuilleAlvareez)*
-```
